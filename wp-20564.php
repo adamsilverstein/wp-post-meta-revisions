@@ -10,7 +10,6 @@ License: GPLv2 or later
 
 class WP_20564 {
 
-
 	/**
 	 * Set up the plugin actions
 	 */
@@ -71,6 +70,7 @@ class WP_20564 {
 	 * Check whether revisioned post meta fields have changed.
 	 */
 	function _wp_check_revisioned_meta_fields_have_changed() {
+		global $post;
 		$post_has_changed = false;
 		foreach ( _wp_post_revision_meta_keys() as $meta_key ) {
 			if ( get_post_meta( $post->ID, $meta_key ) != get_post_meta( $last_revision->ID, $meta_key ) ) {
@@ -85,6 +85,7 @@ class WP_20564 {
 	 * Save the revisioned meta fields
 	 */
 	function _wp_save_revisioned_meta_fields( $revision_id ) {
+		global $post;
 		$post_id = (int) $post['ID'];
 		// Save revisioned meta fields.
 		foreach ( _wp_post_revision_meta_keys() as $meta_key ) {
@@ -159,6 +160,7 @@ class WP_20564 {
 
 		return get_post_meta( $preview->ID, $meta_key, $single );
 	}
-
-
 }
+
+$wp_20564 = new WP_20564;
+
