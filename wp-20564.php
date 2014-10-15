@@ -27,21 +27,21 @@ class WP_20564 {
 	/**
 	 * Autosave the revisioned meta fields
 	 */
-	private static function _wp_autosave_post_revisioned_meta_fields( $new_autosave_id ) {
+	private static function _wp_autosave_post_revisioned_meta_fields( $new_autosave ) {
 		// Auto-save revisioned meta fields.
 		foreach ( _wp_post_revision_meta_keys() as $meta_key ) {
 			if ( isset( $_POST[ $meta_key ] )
 				&& '' !== $_POST[ $meta_key ]
-				&& get_post_meta( $new_autosave_id, $meta_key, true ) != wp_unslash( $_POST[ $meta_key ] ) )
+				&& get_post_meta( $new_autosave['ID'], $meta_key, true ) != wp_unslash( $_POST[ $meta_key ] ) )
 			{
 				/*
 				 * Use the underlying delete_metadata() and add_metadata() functions
 				 * vs delete_post_meta() and add_post_meta() to make sure we're working
 				 * with the actual revision meta.
 				 */
-				delete_metadata( 'post', $new_autosave_id, $meta_key );
+				delete_metadata( 'post', $new_autosave['ID'], $meta_key );
 				if ( ! empty( $_POST[ $meta_key ] ) ) {
-					add_metadata( 'post', $new_autosave_id, $meta_key, $_POST[ $meta_key ] );
+					add_metadata( 'post', $new_autosave['ID'], $meta_key, $_POST[ $meta_key ] );
 				}
 			}
 		}
