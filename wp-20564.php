@@ -29,7 +29,7 @@ class WP_20564 {
 	 */
 	private static function _wp_autosave_post_revisioned_meta_fields( $new_autosave ) {
 		// Auto-save revisioned meta fields.
-		foreach ( _wp_post_revision_meta_keys() as $meta_key ) {
+		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			if ( isset( $_POST[ $meta_key ] )
 				&& '' !== $_POST[ $meta_key ]
 				&& get_post_meta( $new_autosave['ID'], $meta_key, true ) != wp_unslash( $_POST[ $meta_key ] ) )
@@ -72,7 +72,7 @@ class WP_20564 {
 	function _wp_check_revisioned_meta_fields_have_changed() {
 		global $post;
 		$post_has_changed = false;
-		foreach ( _wp_post_revision_meta_keys() as $meta_key ) {
+		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			if ( get_post_meta( $post->ID, $meta_key ) != get_post_meta( $last_revision->ID, $meta_key ) ) {
 				$post_has_changed = true;
 				break;
@@ -88,7 +88,7 @@ class WP_20564 {
 		global $post;
 		$post_id = (int) $post['ID'];
 		// Save revisioned meta fields.
-		foreach ( _wp_post_revision_meta_keys() as $meta_key ) {
+		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
 			// Don't save blank meta values
@@ -102,7 +102,7 @@ class WP_20564 {
 			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
 		}
 		// Save the revisioned meta keys so we know which meta keys were revisioned
-		add_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys',  _wp_post_revision_meta_keys() );
+		add_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys', $this->_wp_post_revision_meta_keys() );
 	}
 
 	/**
@@ -146,7 +146,7 @@ class WP_20564 {
 		$post = get_post();
 		if ( empty( $post )
 			|| $post->ID != $object_id
-			|| ! in_array( $meta_key, _wp_post_revision_meta_keys() )
+			|| ! in_array( $meta_key, $this->_wp_post_revision_meta_keys() )
 			|| 'revision' == $post->post_type )
 		{
 			return $value;
