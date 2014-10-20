@@ -3,7 +3,7 @@
 Plugin Name: WP-20564
 Plugin URI: https://github.com/adamsilverstein/wp-20564
 Description: Revisions Post Meta
-Version: 0.1
+Version: 0.2
 Author: Adam Silverstein - code developed with others at https://core.trac.wordpress.org/ticket/20564
 License: GPLv2 or later
 */
@@ -20,7 +20,7 @@ class WP_20564 {
 		add_action( '_wp_put_post_revision', array( $this, '_wp_save_revisioned_meta_fields' ) );
 		//Filters
 		add_filter( 'get_post_metadata',     array( $this, '_wp_preview_meta_filter'), 10, 4 );
-		add_filter( 'wp_save_post_revision_check_for_changes',  array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
+		add_filter( 'wp_save_post_revision_additional_check_for_changes', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
 	}
 
@@ -69,9 +69,7 @@ class WP_20564 {
 	/**
 	 * Check whether revisioned post meta fields have changed.
 	 */
-	function _wp_check_revisioned_meta_fields_have_changed() {
-		global $post;
-		$post_has_changed = false;
+	function _wp_check_revisioned_meta_fields_have_changed( $post_has_changed, $last_revision, $post ) {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			if ( get_post_meta( $post->ID, $meta_key ) != get_post_meta( $last_revision->ID, $meta_key ) ) {
 				$post_has_changed = true;
@@ -85,21 +83,21 @@ class WP_20564 {
 	 * Save the revisioned meta fields
 	 */
 	function _wp_save_revisioned_meta_fields( $revision_id ) {
-		global $post;
-		$post_id = (int) $post['ID'];
+		$revision = get_post( $revision_id );
+		$post_id  = $revision->post_parent;
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
 			// Don't save blank meta values
-			if( '' == $meta_value ) {
-				continue;
+			if( '' !== $meta_value[0] ) {
+
+				/*
+				 * Use the underlying add_metadata() function vs add_post_meta()
+				 * to ensure metadata is added to the revision post and not its parent.
+				 */
+				add_metadata( 'post', $revision_id, $meta_key, $meta_value );
 			}
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
 		}
 		// Save the revisioned meta keys so we know which meta keys were revisioned
 		add_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys', $this->_wp_post_revision_meta_keys() );
@@ -108,19 +106,20 @@ class WP_20564 {
 	/**
 	 * Restore the revisioned meta values for a post
 	 */
-	function _wp_restore_post_revision_meta( $post_id, $revision_id) {
+	function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
+		//var_dump( get_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys' ) );
 		// Restore revisioned meta fields; first get the keys for this revision
 		$metas_revisioned =  wp_unslash( get_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys' ) );
-
-		if ( ! empty( $metas_revisioned[0] ) ) {
+		if ( 0 !== sizeof( $metas_revisioned[0] ) ) {
 			foreach ( $metas_revisioned[0] as $meta_key ) {
 				// Clear any existing metas
-				delete_post_meta( $revision['ID'], $meta_key );
+				delete_post_meta( $post_id, $meta_key );
 				// Get the stored meta, not stored === blank
-				$meta_values = get_post_meta( $revision['ID'], $meta_key, true );
-
-				foreach( $meta_values as $meta_value ) {
-					add_post_meta( $update['ID'], $meta_key, $meta_value );
+				$meta_values = get_post_meta( $revision_id, $meta_key, true );
+				if ( 0 !== sizeof( $meta_values ) && is_array( $meta_values ) ) {
+					foreach( $meta_values as $meta_value ) {
+						add_post_meta( $post_id, $meta_key, $meta_value );
+					}
 				}
 			}
 		}
