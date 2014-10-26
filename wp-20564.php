@@ -10,10 +10,14 @@ License: GPLv2 or later
 
 class WP_20564 {
 
+	private static $instance;
+	private $revisioned_meta = array();
+
 	/**
 	 * Set up the plugin actions
 	 */
 	public function __construct() {
+
 		// Actions
 		add_action( 'wp_restore_post_revision', array( $this, '_wp_restore_post_revision_meta'), 10, 2 );
 		add_action( '_wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
@@ -22,44 +26,20 @@ class WP_20564 {
 		add_filter( 'get_post_metadata',     array( $this, '_wp_preview_meta_filter'), 10, 4 );
 		add_filter( 'wp_save_post_revision_additional_check_for_changes', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
-		add_filter( 'wp_get_revision_ui_diff', function( $return, $compare_from, $compare_to ) {
+		add_filter( 'wp_get_revision_ui_diff', array( $this, '_wp_get_revision_ui_diff' ), 10, 3 );
 
-			foreach ( $this->metas_revisioned as $key => $label ) {
-
-				$meta_1 = $this->multi_implode( "\r", get_metadata( 'post', $compare_from->ID, $key, false ) );
-				$meta_2 = $this->multi_implode( "\r", get_metadata( 'post', $compare_to->ID,   $key, false ) );
-
-				$diff = wp_text_diff( $meta_1, $meta_2, array( 'show_split_view' => true ) );
-
-				$return[] = array(
-					'id' => $key,
-					'name' => $label,
-					'diff' => $diff,
-				);
-
-			}
-
-			return $return;
-
-		}, 10, 3 );
 	}
 
-	function multi_implode( $glue, $array ) {
-
-		$return = '';
-
-		foreach ( $array as $item ) {
-			if ( is_array( $item ) ) {
-				$return .= multi_implode( $item, $glue ) . $glue;
-			} else {
-				$return .= $item . $glue;
-			}
+	/**
+	 * Creates or returns an instance of this class.
+	 *
+	 * @return HM_Post_Meta_Revisions A single instance of this class.
+	 */
+	public static function get_instance() {
+		if ( null == self::$instance ) {
+			self::$instance = new self;
 		}
-
-		$return = substr( $return, 0, 0 - strlen( $glue ) );
-
-		return $return;
-
+		return self::$instance;
 	}
 
 	/**
@@ -85,8 +65,16 @@ class WP_20564 {
 		}
 	}
 
+	public function add_revisioned_meta( $key, $label, $display_callback = null ) {
+		$this->revisioned_meta[ $key ] = array(
+			'key'              => $key,
+			'label'            => $label,
+			'display_callback' => $display_callback
+		);
+	}
+
 	/**
-	 * Determine which post meta fields should be revisioned.
+	 * Get meta keys that should be revisioned.
 	 *
 	 * @access private
 	 * @since 4.1.0
@@ -94,14 +82,7 @@ class WP_20564 {
 	 * @return array An array of meta keys to be revisioned.
 	 */
 	function _wp_post_revision_meta_keys() {
-		/**
-		 * Filter the list of post meta keys to be revisioned.
-		 *
-		 * @since 4.1.0
-		 *
-		 * @param array $keys An array of default meta fields to be revisioned.
-		 */
-		return apply_filters( 'wp_post_revision_meta_keys', array() );
+		return array_keys( $this->revisioned_meta );
 	}
 
 	/**
@@ -197,7 +178,63 @@ class WP_20564 {
 
 		return get_post_meta( $preview->ID, $meta_key, $single );
 	}
+
+	function _wp_get_revision_ui_diff( $return, $compare_from, $compare_to ) {
+
+		foreach ( $this->_wp_post_revision_meta_keys() as $key ) {
+
+			$meta_1 = get_metadata( 'post', $compare_from->ID, $key, false );
+			$meta_2 = get_metadata( 'post', $compare_to->ID,   $key, false );
+
+			if ( ! empty( $this->revisioned_meta[ $key ]['display_callback'] ) ) {
+				$meta_1 = call_user_func( $this->revisioned_meta[ $key ]['display_callback'], $meta_1, $field, $compare_from, $compare_to );
+				$meta_2 = call_user_func( $this->revisioned_meta[ $key ]['display_callback'], $meta_2, $field, $compare_from, $compare_to );
+			} else {
+				$meta_1 = $this->multi_implode( "\r", $meta_1 );
+				$meta_2 = $this->multi_implode( "\r", $meta_2 );
+			}
+
+			$diff = wp_text_diff( $meta_1, $meta_2, array( 'show_split_view' => true ) );
+
+			$return[] = array(
+				'id' => $key,
+				'name' => $this->revisioned_meta[ $key ]['label'],
+				'diff' => $diff,
+			);
+
+		}
+
+		return $return;
+
+	}
+
+	function multi_implode( $glue, $array ) {
+
+		if ( ! is_array( $array ) ) {
+			return $array;
+		}
+
+		$return = '';
+
+		foreach ( $array as $item ) {
+			if ( is_array( $item ) ) {
+				$return .= $this->multi_implode( $glue, $item ) . $glue;
+			} else {
+				$return .= $item . $glue;
+			}
+		}
+
+		$return = substr( $return, 0, 0 - strlen( $glue ) );
+
+		return $return;
+
+	}
+
 }
 
-$wp_20564 = new WP_20564;
+$wp_20564 = WP_20564::get_instance();
 
+function wp_add_revisioned_meta( $key, $label, $display_callback = null ) {
+	$wp_20564 = WP_20564::get_instance();
+	$wp_20564->add_revisioned_meta( $key, $label, $display_callback );
+}
