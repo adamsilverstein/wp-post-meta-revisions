@@ -22,6 +22,44 @@ class WP_20564 {
 		add_filter( 'get_post_metadata',     array( $this, '_wp_preview_meta_filter'), 10, 4 );
 		add_filter( 'wp_save_post_revision_additional_check_for_changes', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
+		add_filter( 'wp_get_revision_ui_diff', function( $return, $compare_from, $compare_to ) {
+
+			foreach ( $this->metas_revisioned as $key => $label ) {
+
+				$meta_1 = $this->multi_implode( "\r", get_metadata( 'post', $compare_from->ID, $key, false ) );
+				$meta_2 = $this->multi_implode( "\r", get_metadata( 'post', $compare_to->ID,   $key, false ) );
+
+				$diff = wp_text_diff( $meta_1, $meta_2, array( 'show_split_view' => true ) );
+
+				$return[] = array(
+					'id' => $key,
+					'name' => $label,
+					'diff' => $diff,
+				);
+
+			}
+
+			return $return;
+
+		}, 10, 3 );
+	}
+
+	function multi_implode( $glue, $array ) {
+
+		$return = '';
+
+		foreach ( $array as $item ) {
+			if ( is_array( $item ) ) {
+				$return .= multi_implode( $item, $glue ) . $glue;
+			} else {
+				$return .= $item . $glue;
+			}
+		}
+
+		$return = substr( $return, 0, 0 - strlen( $glue ) );
+
+		return $return;
+
 	}
 
 	/**
