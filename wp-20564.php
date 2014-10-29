@@ -14,6 +14,7 @@ class WP_20564 {
 	 * Set up the plugin actions
 	 */
 	public function __construct() {
+
 		// Actions
 		add_action( 'wp_restore_post_revision', array( $this, '_wp_restore_post_revision_meta'), 10, 2 );
 		add_action( '_wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
