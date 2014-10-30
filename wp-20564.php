@@ -3,7 +3,7 @@
 Plugin Name: WP-20564
 Plugin URI: https://github.com/adamsilverstein/wp-20564
 Description: Revisions Post Meta
-Version: 0.2
+Version: 0.3
 Author: Adam Silverstein - code developed with others at https://core.trac.wordpress.org/ticket/20564
 License: GPLv2 or later
 */
