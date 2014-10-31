@@ -3,6 +3,14 @@
 class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
+	 * Callback function to add the revisioned keys
+	 */
+	function add_revisioned_keys( $keys ) {
+		$keys[] = 'meta_revision_test';
+		return $keys;
+	}
+
+	/**
 	 * Test the revisions system for storage of meta values
 	 */
 	function test_revisions_stores_meta_values() {
@@ -70,10 +78,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		 */
 
 		// Add the custom field to be revised via the wp_post_revision_meta_keys filter
-		add_filter( 'wp_post_revision_meta_keys', function( $keys ) {
-			$keys[] = 'meta_revision_test';
-			return $keys;
-		});
+		add_filter( 'wp_post_revision_meta_keys', 'add_revisioned_keys' );
 
 		// Save the post, changing content to force a revision
 		wp_update_post( array( 'post_content'	=> 'more updated content', 'ID' => $post_id ) );
