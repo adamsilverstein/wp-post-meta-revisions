@@ -17,11 +17,11 @@ class WP_20564 {
 
 		// Actions
 		add_action( 'wp_restore_post_revision', array( $this, '_wp_restore_post_revision_meta'), 10, 2 );
-		add_action( '_wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
+		add_action( 'wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
 		add_action( '_wp_put_post_revision', array( $this, '_wp_save_revisioned_meta_fields' ) );
 		//Filters
 		add_filter( 'get_post_metadata',     array( $this, '_wp_preview_meta_filter'), 10, 4 );
-		add_filter( 'wp_save_post_revision_additional_check_for_changes', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
+		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
 	}
 
