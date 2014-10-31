@@ -150,10 +150,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$this->assertEquals( 'update 6', get_post_meta( $post_id, 'meta_revision_test', true ) );
 
 		// Add the custom field to be revised via the wp_post_revision_meta_keys filter
-		add_filter( 'wp_post_revision_meta_keys', function( $keys ) {
-			$keys[] = 'meta_revision_test';
-			return $keys;
-		});
+		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
 
 		/**
 		 * Test the revisioning of multiple meta keys
