@@ -27,7 +27,6 @@ install_wp() {
 
 	git clone --depth=1 --branch="$WP_VERSION" git://develop.git.wordpress.org/ $WP_CORE_DIR
 
-	wget -nv -O $WP_CORE_DIR/wp-content/db.php https://raw.github.com/markoheijnen/wp-mysqli/master/db.php
 }
 
 install_test_suite() {
