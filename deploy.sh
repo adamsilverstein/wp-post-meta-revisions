@@ -5,7 +5,7 @@
 # The difference is that this script lives in the plugin's git repo & doesn't require an existing SVN repo.
 
 # main config
-PLUGINSLUG='wp-post-meta-revisions' 
+PLUGINSLUG='wp-post-meta-revisions'
 CURRENTDIR=`pwd` # returns basename of current directory
 MAINFILE="wp-post-meta-revisions.php" # this should be the name of your main php file in the wordpress plugin
 
@@ -29,7 +29,7 @@ echo
 # Check version in readme.txt is the same as plugin file
 NEWVERSION1=`grep "^Stable tag" $GITPATH/readme.txt | awk -F' ' '{print $3}' | sed 's/[[:space:]]//g'`
 echo "readme version: $NEWVERSION1"
-NEWVERSION2=`grep "^Version" $GITPATH/$MAINFILE | awk -F' ' '{print $2}' | sed 's/[[:space:]]//g'`
+NEWVERSION2=`grep "^ \* Version" $GITPATH/$MAINFILE | awk -F' ' '{print $3}' | sed 's/[[:space:]]//g'`
 echo "$MAINFILE version: $NEWVERSION2"
 
 if [ "$NEWVERSION1" != "$NEWVERSION2" ]; then echo "Versions don't match. Exiting...."; exit 1; fi
