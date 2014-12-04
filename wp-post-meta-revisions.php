@@ -3,13 +3,13 @@
  * Plugin Name: wp-post-meta-revisions
  * Plugin URI: https://github.com/adamsilverstein/wp-post-meta-revisions
  * Description: Post Meta Revisions
- * Version: 0.4
+ * Version: 0.5
  * Author: Adam Silverstein - code developed with others
  * at https://core.trac.wordpress.org/ticket/20564
  * License: GPLv2 or later
 */
 
-class WP_20564 {
+class WP_POST_META_REVISIONING {
 
 	/**
 	 * Set up the plugin actions
@@ -174,4 +174,4 @@ class WP_20564 {
 	}
 }
 
-$wp_20564 = new WP_20564;
+$wp_POST_META_REVISIONING = new WP_POST_META_REVISIONING;
