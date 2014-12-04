@@ -5,9 +5,9 @@
 # The difference is that this script lives in the plugin's git repo & doesn't require an existing SVN repo.
 
 # main config
-PLUGINSLUG='slug' 
+PLUGINSLUG='wp-post-meta-revisions' 
 CURRENTDIR=`pwd` # returns basename of current directory
-MAINFILE="slug.php" # this should be the name of your main php file in the wordpress plugin
+MAINFILE="wp-post-meta-revisions.php" # this should be the name of your main php file in the wordpress plugin
 
 # git config
 GITPATH="$CURRENTDIR/" # this file should be in the base of your git repository
@@ -43,10 +43,6 @@ git commit -am "$COMMITMSG"
 
 echo "Tagging new version in git"
 git tag -a "$NEWVERSION1" -m "Tagging version $NEWVERSION1"
-
-echo "Pushing latest master to beanstalk, with tags"
-git push beanstalk master
-git push beanstalk master --tags
 
 echo "Pushing latest master to github, with tags"
 git push github master
