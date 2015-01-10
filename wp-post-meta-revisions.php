@@ -116,7 +116,7 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Check whether revisioned post meta fields have changed.
 	 */
-	private function _wp_check_revisioned_meta_fields_have_changed( $post_has_changed, $last_revision, $post ) {
+	private function _wp_check_revisioned_meta_fields_have_changed( bool $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			if ( get_post_meta( $post->ID, $meta_key ) != get_post_meta( $last_revision->ID, $meta_key ) ) {
 				$post_has_changed = true;
