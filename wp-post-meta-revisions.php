@@ -35,14 +35,14 @@ class WP_Post_Meta_Revisioning {
 	}
 
 	// Add the reviosioned meta to get_post_metadata for preview meta data
-	function _add_metadata_preview_filter() {
+	private function _add_metadata_preview_filter() {
 		add_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter'), 10, 4 );
 	}
 
 	/**
 	 * Autosave the revisioned meta fields
 	 */
-	function _wp_autosave_post_revisioned_meta_fields( $new_autosave ) {
+	private function _wp_autosave_post_revisioned_meta_fields( $new_autosave ) {
 		//Temporarily remove the get_post_metadata filter
 		remove_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter'), 10 );
 		// Auto-save revisioned meta fields.
@@ -78,7 +78,7 @@ class WP_Post_Meta_Revisioning {
 	 *
 	 * @return array An array of meta keys to be revisioned.
 	 */
-	function wp_post_revision_meta_keys_for_revision( $revision_id = null ) {
+	public function wp_post_revision_meta_keys_for_revision( $revision_id = null ) {
 		$revisioned_meta_keys = array();
 		/**
 		 * If a revision_id is specified, look for a list of revisioned metas for that revision.
@@ -102,7 +102,7 @@ class WP_Post_Meta_Revisioning {
 	 *
 	 * @return array An array of meta keys to be revisioned.
 	 */
-	function _wp_post_revision_meta_keys() {
+	private function _wp_post_revision_meta_keys() {
 		/**
 		 * Filter the list of post meta keys to be revisioned.
 		 *
@@ -116,7 +116,7 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Check whether revisioned post meta fields have changed.
 	 */
-	function _wp_check_revisioned_meta_fields_have_changed( $post_has_changed, $last_revision, $post ) {
+	private function _wp_check_revisioned_meta_fields_have_changed( $post_has_changed, $last_revision, $post ) {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			if ( get_post_meta( $post->ID, $meta_key ) != get_post_meta( $last_revision->ID, $meta_key ) ) {
 				$post_has_changed = true;
@@ -129,7 +129,7 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Save the revisioned meta fields
 	 */
-	function _wp_save_revisioned_meta_fields( $revision_id ) {
+	private function _wp_save_revisioned_meta_fields( $revision_id ) {
 		$revision = get_post( $revision_id );
 		$post_id  = $revision->post_parent;
 		// Save revisioned meta fields.
@@ -153,7 +153,7 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Restore the revisioned meta values for a post
 	 */
-	function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
+	private function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
 		// Restore revisioned meta fields; first get the keys for this revision
 		$metas_revisioned =  wp_unslash( get_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys' ) );
 		if ( 0 !== sizeof( $metas_revisioned[0] ) ) {
@@ -187,7 +187,7 @@ class WP_Post_Meta_Revisioning {
 	 *               the post type is a revision or the post ID doesn't match the object ID.
 	 *               Otherwise, the revisioned meta value is returned for the preview.
 	 */
-	function _wp_preview_meta_filter( $value, $object_id, $meta_key, $single ) {
+	private function _wp_preview_meta_filter( $value, $object_id, $meta_key, $single ) {
 		$post = get_post();
 		if ( empty( $post )
 			|| $post->ID != $object_id
@@ -196,7 +196,7 @@ class WP_Post_Meta_Revisioning {
 		{
 			return $value;
 		}
-		error_log('_wp_preview_meta_filter');
+
 		// Grab the autosave.
 		$preview = wp_get_post_autosave( $post->ID );
 		if ( ! is_object( $preview ) ) {
