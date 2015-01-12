@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/adamsilverstein/wp-post-meta-revisions.svg?branch=master)](https://travis-ci.org/adamsilverstein/wp-post-meta-revisions)
+
 === WP-Post-Meta-Revisions ===
 Contributors: adamsilverstein
 Requires at least: 4.1
