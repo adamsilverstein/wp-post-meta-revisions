@@ -21,8 +21,9 @@ class WP_Post_Meta_Revisioning {
 		// When restoring a revision, also restore that revisions's revisioned meta.
 		add_action( 'wp_restore_post_revision', array( $this, '_wp_restore_post_revision_meta'), 10, 2 );
 
-		// When creating an autosave, save any revisioned meta fields.
+		// When creating or updating an autosave, save any revisioned meta fields.
 		add_action( 'wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
+		add_action( 'wp_updating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
 
 		// When creating a revision, also save any revisioned meta.
 		add_action( '_wp_put_post_revision', array( $this, '_wp_save_revisioned_meta_fields' ) );
@@ -40,16 +41,29 @@ class WP_Post_Meta_Revisioning {
 	}
 
 	/**
-	 * Autosave the revisioned meta fields
+	 * Autosave the revisioned meta fields.
+	 *
+	 * Iterates thru the revisioned meta fields and checks each to see if they are set,
+	 * and have a changed value. If so, the meta value is saved and attached to the autosave.
+	 *
+	 * @param Post object $new_autosave The new post being autosaved.
 	 */
 	public function _wp_autosave_post_revisioned_meta_fields( $new_autosave ) {
-		//Temporarily remove the get_post_metadata filter
-		remove_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter'), 10 );
-		// Auto-save revisioned meta fields.
+		/**
+		 * The post data arrives as either $_POST['data']['wp_autosave'] or the $_POST
+		 * itself. This sets $posted_data to the correct variable.
+		 */
+		$posted_data = isset( $_POST['data'] ) ? $_POST['data']['wp_autosave'] : $_POST;
+		/**
+		 * Go thru the revisioned meta keys and save them as part of the autosave, if
+		 * the meta key is part of the posted data, the meta value is not blank and
+		 * the the meta value has changes from the last autosaved value.
+		 */
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			if ( isset( $_POST[ $meta_key ] )
-				&& '' !== $_POST[ $meta_key ]
-				&& get_post_meta( $new_autosave['ID'], $meta_key, true ) != wp_unslash( $_POST[ $meta_key ] ) )
+
+			if ( isset( $posted_data[ $meta_key ] )
+				&& '' !== $posted_data[ $meta_key ]
+				&& get_post_meta( $new_autosave['ID'], $meta_key, true ) != wp_unslash( $posted_data[ $meta_key ] ) )
 			{
 				/*
 				 * Use the underlying delete_metadata() and add_metadata() functions
@@ -57,13 +71,17 @@ class WP_Post_Meta_Revisioning {
 				 * with the actual revision meta.
 				 */
 				delete_metadata( 'post', $new_autosave['ID'], $meta_key );
-				if ( ! empty( $_POST[ $meta_key ] ) ) {
-					add_metadata( 'post', $new_autosave['ID'], $meta_key, $_POST[ $meta_key ] );
+				/**
+				 * One last check to ensure meta value not empty().
+				 */
+				if ( ! empty( $posted_data[ $meta_key ] ) ) {
+					/**
+					 * Add the revisions meta data to the autosave.
+					 */
+					add_metadata( 'post', $new_autosave['ID'], $meta_key, $posted_data[ $meta_key ] );
 				}
 			}
 		}
-		// Restore the get_post_metadata filter
-		add_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter'), 10, 4 );
 	}
 	/**
 	 * Determine which post meta fields are revisioned for the current post or
@@ -188,10 +206,11 @@ class WP_Post_Meta_Revisioning {
 	 *               Otherwise, the revisioned meta value is returned for the preview.
 	 */
 	public function _wp_preview_meta_filter( $value, $object_id, $meta_key, $single ) {
+
 		$post = get_post();
 		if ( empty( $post )
 			|| $post->ID != $object_id
-			|| ! in_array( $meta_key, $this->_wp_post_revision_meta_keys() )
+			|| ! in_array( $meta_key, self::_wp_post_revision_meta_keys() )
 			|| 'revision' == $post->post_type )
 		{
 			return $value;
