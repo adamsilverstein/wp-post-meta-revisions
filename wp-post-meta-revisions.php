@@ -210,7 +210,7 @@ class WP_Post_Meta_Revisioning {
 		$post = get_post();
 		if ( empty( $post )
 			|| $post->ID != $object_id
-			|| ! in_array( $meta_key, self::_wp_post_revision_meta_keys() )
+			|| ! in_array( $meta_key, $this->_wp_post_revision_meta_keys() )
 			|| 'revision' == $post->post_type )
 		{
 			return $value;
