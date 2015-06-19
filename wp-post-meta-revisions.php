@@ -154,8 +154,12 @@ class WP_Post_Meta_Revisioning {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
+			if (!isset($meta_value[0])) {
+        continue;
+      }
+
 			// Don't save blank meta values
-			if( '' !== $meta_value[0] ) {
+			if( !empty($meta_value[0]) ) {
 
 				/*
 				 * Use the underlying add_metadata() function vs add_post_meta()
