@@ -19,7 +19,7 @@ class WP_Post_Meta_Revisioning {
 		// Actions
 		//
 		// When restoring a revision, also restore that revisions's revisioned meta.
-		add_action( 'wp_restore_post_revision', array( $this, '_wp_restore_post_revision_meta'), 10, 2 );
+		add_action( 'wp_restore_post_revision', array( $this, '_wp_restore_post_revision_meta' ), 10, 2 );
 
 		// When creating or updating an autosave, save any revisioned meta fields.
 		add_action( 'wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
@@ -155,7 +155,7 @@ class WP_Post_Meta_Revisioning {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
 			// Don't save blank meta values
-			if( ! empty($meta_value) && ('' !== $meta_value[0]) ) {
+			if ( ( ! empty( $meta_value ) ) && ( '' !== $meta_value[0] ) ) {
 
 				/*
 				 * Use the underlying add_metadata() function vs add_post_meta()
@@ -188,7 +188,8 @@ class WP_Post_Meta_Revisioning {
 			}
 		}
 	}
-	 /**
+
+	/**
 	 * Filters post meta retrieval to get values from the actual autosave post,
 	 * and not its parent.
 	 *
