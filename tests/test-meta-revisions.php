@@ -198,7 +198,7 @@ class MetaRevisionTests extends \WP_UnitTestCase {
 
 
 		/**
-		 * Test the revisions of a multidimensional array.
+		 * Test the revisioning of a multidimensional array.
 		 */
 		$test_array = array(
 			'a' => array(
