@@ -1,6 +1,6 @@
 <?php
 
-class MetaRevisionTests extends \WP_UnitTestCase {
+class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
 	 * Callback function to add the revisioned keys
