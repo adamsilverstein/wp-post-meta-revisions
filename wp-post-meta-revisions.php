@@ -120,7 +120,7 @@ class WP_Post_Meta_Revisioning {
 	 *
 	 * @return array An array of meta keys to be revisioned.
 	 */
-	public static function _wp_post_revision_meta_keys() {
+	public function _wp_post_revision_meta_keys() {
 		/**
 		 * Filter the list of post meta keys to be revisioned.
 		 *
