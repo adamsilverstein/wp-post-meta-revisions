@@ -1,5 +1,4 @@
 <?php
-namespace metarevisions;
 
 class MetaRevisionTests extends \WP_UnitTestCase {
 
