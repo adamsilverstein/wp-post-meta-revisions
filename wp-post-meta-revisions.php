@@ -23,7 +23,7 @@ class WP_Post_Meta_Revisioning {
 
 		// When creating or updating an autosave, save any revisioned meta fields.
 		add_action( 'wp_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
-		add_action( 'wp_updating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
+		add_action( 'wp_before_creating_autosave', array( $this, '_wp_autosave_post_revisioned_meta_fields' ) );
 
 		// When creating a revision, also save any revisioned meta.
 		add_action( '_wp_put_post_revision', array( $this, '_wp_save_revisioned_meta_fields' ) );
