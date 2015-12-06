@@ -35,7 +35,11 @@ class WP_Post_Meta_Revisioning {
 
 	}
 
-	// Add the reviosioned meta to get_post_metadata for preview meta data
+	/**
+	 * Add the revisioned meta to get_post_metadata for preview meta data.
+	 *
+	 * @since 4.5.0
+	 */
 	public function _add_metadata_preview_filter() {
 		add_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter'), 10, 4 );
 	}
@@ -45,6 +49,8 @@ class WP_Post_Meta_Revisioning {
 	 *
 	 * Iterates thru the revisioned meta fields and checks each to see if they are set,
 	 * and have a changed value. If so, the meta value is saved and attached to the autosave.
+	 *
+	 * @since 4.5.0
 	 *
 	 * @param Post object $new_autosave The new post being autosaved.
 	 */
@@ -87,7 +93,7 @@ class WP_Post_Meta_Revisioning {
 	 * Determine which post meta fields should be revisioned.
 	 *
 	 * @access public
-	 * @since 4.2.0
+	 * @since 4.5.0
 	 *
 	 * @return array An array of meta keys to be revisioned.
 	 */
@@ -95,7 +101,7 @@ class WP_Post_Meta_Revisioning {
 		/**
 		 * Filter the list of post meta keys to be revisioned.
 		 *
-		 * @since 4.2.0
+		 * @since 4.5.0
 		 *
 		 * @param array $keys An array of default meta fields to be revisioned.
 		 */
@@ -104,6 +110,8 @@ class WP_Post_Meta_Revisioning {
 
 	/**
 	 * Check whether revisioned post meta fields have changed.
+	 *
+	 * @since 4.5.0
 	 */
 	public function _wp_check_revisioned_meta_fields_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
@@ -116,7 +124,9 @@ class WP_Post_Meta_Revisioning {
 	}
 
 	/**
-	 * Save the revisioned meta fields
+	 * Save the revisioned meta fields.
+	 *
+	 * @since 4.5.0
 	 */
 	public function _wp_save_revisioned_meta_fields( $revision_id ) {
 		$revision = get_post( $revision_id );
@@ -134,7 +144,9 @@ class WP_Post_Meta_Revisioning {
 	}
 
 	/**
-	 * Restore the revisioned meta values for a post
+	 * Restore the revisioned meta values for a post.
+	 *
+	 * @since 4.5.0
 	 */
 	public function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
 		// Restore revisioned meta fields.
@@ -161,7 +173,7 @@ class WP_Post_Meta_Revisioning {
 	 * Filters revisioned meta keys only.
 	 *
 	 * @access public
-	 * @since 4.2.0
+	 * @since 4.5.0
 	 *
 	 * @param mixed  $value     Meta value to filter.
 	 * @param int    $object_id Object ID.
