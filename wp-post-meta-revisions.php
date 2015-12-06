@@ -30,7 +30,7 @@ class WP_Post_Meta_Revisioning {
 
 
 		//Filters
-		// When revisioned post meta has changed, trigger a revision save
+		// When revisioned post meta has changed, trigger a revision save.
 		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
 	}
