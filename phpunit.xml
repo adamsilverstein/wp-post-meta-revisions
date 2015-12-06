@@ -11,4 +11,10 @@
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
+	<filter>
+		<whitelist>
+			<file>./wp-post-meta-revisions.php</file>
+		</whitelist>
+	</filter>
+
 </phpunit>
