@@ -82,34 +82,6 @@ class WP_Post_Meta_Revisioning {
 			}
 		}
 	}
-	/**
-	 * Determine which post meta fields are revisioned for the current post or
-	 * a specific revision.
-	 *
-	 * @access public
-	 * @since 4.2.0
-	 *
-	 * @param int    $revision_id The ID of the revision to retrieve post meta fields
-	 *                            revisioned for a specific revision. Retrieves current list
-	 *                            of keys by default.
-	 *
-	 * @return array An array of meta keys to be revisioned.
-	 */
-	public function wp_post_revision_meta_keys_for_revision( $revision_id = null ) {
-		$revisioned_meta_keys = array();
-		/**
-		 * If a revision_id is specified, look for a list of revisioned metas for that revision.
-		 */
-		if ( null !== $revision_id ) {
-			$metas_revisioned =  wp_unslash( get_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys' ) );
-			if ( 0 !== sizeof( $metas_revisioned[0] ) ) {
-				$revisioned_meta_keys = $metas_revisioned;
-			}
-		} else {
-			$revisioned_meta_keys = $this->_wp_post_revision_meta_keys();
-		}
-		return  $revisioned_meta_keys;
-	}
 
 	/**
 	 * Determine which post meta fields should be revisioned.
@@ -159,8 +131,6 @@ class WP_Post_Meta_Revisioning {
 			 */
 			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
 		}
-		// Save the revisioned meta keys so we know which meta keys were revisioned
-		add_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys', $this->_wp_post_revision_meta_keys() );
 	}
 
 	/**
