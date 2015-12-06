@@ -62,7 +62,6 @@ class WP_Post_Meta_Revisioning {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 
 			if ( isset( $posted_data[ $meta_key ] )
-				&& '' !== $posted_data[ $meta_key ]
 				&& get_post_meta( $new_autosave['ID'], $meta_key, true ) != wp_unslash( $posted_data[ $meta_key ] ) )
 			{
 				/*
@@ -154,15 +153,11 @@ class WP_Post_Meta_Revisioning {
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
-			// Don't save blank meta values
-			if ( ( ! empty( $meta_value ) ) && ( '' !== $meta_value[0] ) ) {
-
-				/*
-				 * Use the underlying add_metadata() function vs add_post_meta()
-				 * to ensure metadata is added to the revision post and not its parent.
-				 */
-				add_metadata( 'post', $revision_id, $meta_key, $meta_value );
-			}
+			/*
+			 * Use the underlying add_metadata() function vs add_post_meta()
+			 * to ensure metadata is added to the revision post and not its parent.
+			 */
+			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
 		}
 		// Save the revisioned meta keys so we know which meta keys were revisioned
 		add_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys', $this->_wp_post_revision_meta_keys() );
