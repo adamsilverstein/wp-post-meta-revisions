@@ -137,8 +137,8 @@ class WP_Post_Meta_Revisioning {
 	 * Restore the revisioned meta values for a post
 	 */
 	public function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
-		// Restore revisioned meta fields; first get the keys for this revision
-		$metas_revisioned =  wp_unslash( get_metadata( 'post', $revision_id, '_wp_post_revision_meta_keys' ) );
+		// Restore revisioned meta fields.
+		$metas_revisioned =  $this->_wp_post_revision_meta_keys();
 		if ( 0 !== sizeof( $metas_revisioned[0] ) ) {
 			foreach ( $metas_revisioned[0] as $meta_key ) {
 				// Clear any existing metas
