@@ -12,6 +12,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
 	 * Test the revisions system for storage of meta values
+	 * @group revision
 	 */
 	function test_revisions_stores_meta_values() {
 
