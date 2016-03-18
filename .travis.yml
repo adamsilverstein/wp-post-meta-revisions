@@ -1,6 +1,7 @@
 language: php
 
 php:
+  include:
   - php: 5.5
     env: WP_TRAVISCI=travis:js
   - php: 5.2
