@@ -3,7 +3,7 @@
  * Plugin Name: Post Meta Revisions
  * Plugin URI: https://github.com/adamsilverstein/wp-post-meta-revisions
  * Description: Post Meta Revisions
- * Version: 0.2.0
+ * Version: 0.2.1
  * Author: Adam Silverstein - code developed with others
  * at https://core.trac.wordpress.org/ticket/20564
  * License: GPLv2 or later
