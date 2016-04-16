@@ -38,3 +38,11 @@ Features:
 * Adds revisioned meta to the preview data via get_post_metadata
 * Includes unit tests demonstrating feature
 * Travis CI tests integrated with GitHub repository, props @mattheu
+
+== Changelog ==
+
+= 0.2.2 =
+* Simplify by no longer storing whitelist per revision.
+
+= 0.1.9 =
+* Initial release.

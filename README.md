@@ -3,8 +3,8 @@
 === WP-Post-Meta-Revisions ===
 * Contributors: adamsilverstein, mattheu
 * Requires at least: 4.1
-* Tested up to: 4.1
-* Stable tag: 0.1.8
+* Tested up to: 4.5
+* Stable tag: 0.2.2
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,4 +40,3 @@ Features:
 * Adds revisioned meta to the preview data via get_post_metadata
 * Includes unit tests demonstrating feature
 * Travis CI tests integrated with GitHub repository, props @mattheu
-
