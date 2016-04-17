@@ -16,6 +16,8 @@ class WP_Post_Meta_Revisioning {
 	 */
 	public function __construct() {
 
+		error_log('WP_Post_Meta_Revisioning');
+
 		// Actions
 		//
 		// When restoring a revision, also restore that revisions's revisioned meta.
@@ -32,6 +34,73 @@ class WP_Post_Meta_Revisioning {
 		// When revisioned post meta has changed, trigger a revision save.
 		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
+		// Add the revisioned meta to the JS data for the revisions interface.
+		add_filter( 'wp_prepare_revision_for_js', array( $this, '_wp_add_meta_to_prepare_revision_for_js' ), 10, 3 );
+
+		// Filter the diff ui returned for the revisions screen.
+		add_filter( 'wp_get_revision_ui_diff', array( $this, '_wp_filter_revision_ui_diff' ), 10, 3 );
+	}
+
+	/**
+	 * Filter the revisions ui diff, adding revisioned meta fields.
+	 *
+	 * @param array   fields        Revision UI fields. Each item is an array of id, name and diff.
+	 * @param WP_Post $compare_from The revision post to compare from.
+	 * @param WP_Post $compare_to   The revision post to compare to.
+	 */
+	function _wp_filter_revision_ui_diff( $fields, $compare_from, $compare_to ) {
+
+		// Do we have revisioned meta fields?
+		$revisioned_meta_keys = $this->_wp_post_revision_meta_keys();
+		if ( ! empty( $revisioned_meta_keys ) ) {
+
+			// Only add the header once, if we have a non-empty meta field.
+			$meta_header_added = false;
+
+			// Check each meta comparison for non empty diffs.
+			foreach ( $revisioned_meta_keys as $meta_key ) {
+				$meta_from = get_post_meta( $compare_from->ID, $meta_key, true );
+				$meta_to   = get_post_meta( $compare_to->ID,   $meta_key, true );
+				$args      = array( 'show_split_view' => true );
+				$args      = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
+				$diff      = wp_text_diff( $meta_from[0], $meta_to[0], $args );
+
+				// Add this meta field if it has a diff.
+				if ( ! empty( $diff ) ) {
+
+					// Add the header if we haven't already.
+					if ( ! $meta_header_added ) {
+						$fields[ $index ]['diff'] .= '<h3>' . __( 'Revisioned Meta') . '</h3>';
+						$meta_header_added = true;
+					}
+
+					// Append the meta diffs to the last field.
+					$last_field = array_pop( $fields );
+					$last_field['diff'] .= '<h4>' . $meta_key . '</h4>';
+					$last_field['diff'] .= $diff;
+					array_push( $fields, $last_field );
+				}
+			}
+		}
+		return $fields;
+	}
+
+	/**
+	 * Add the revisioned meta fields to the revisions interface.
+	 *
+	 * Include filters to enable customization of the meta display.
+	 */
+	function _wp_add_meta_to_prepare_revision_for_js( $revisions_data, $revision, $post ) {
+
+		$revisions_data['revisionedMeta'] = array();
+
+		// Go thru revisioned meta fields, adding them to the display data.
+		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
+			$revisions_data['revisionedMeta'][] = array(
+					$meta_key => get_post_meta( $revisions_data['id'], $meta_key, true ),
+				);
+		}
+		return $revisions_data;
 	}
 
 	/**
