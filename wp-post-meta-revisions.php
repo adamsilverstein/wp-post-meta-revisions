@@ -60,7 +60,7 @@ class WP_Post_Meta_Revisioning {
 				$meta_from = get_post_meta( $compare_from->ID, $meta_key, true );
 				$meta_to   = get_post_meta( $compare_to->ID,   $meta_key, true );
 				$args      = array( 'show_split_view' => true );
-				$args      = apply_filters( 'revision_text_diff_options', $args, $field, $compare_from, $compare_to );
+				$args      = apply_filters( 'revision_text_diff_options', $args, end( $fields ), $compare_from, $compare_to );
 				$diff      = wp_text_diff( $meta_from[0], $meta_to[0], $args );
 
 				// Add this meta field if it has a diff.
