@@ -16,8 +16,6 @@ class WP_Post_Meta_Revisioning {
 	 */
 	public function __construct() {
 
-		error_log('WP_Post_Meta_Revisioning');
-
 		// Actions
 		//
 		// When restoring a revision, also restore that revisions's revisioned meta.
