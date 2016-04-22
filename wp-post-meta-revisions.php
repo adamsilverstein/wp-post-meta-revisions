@@ -72,6 +72,20 @@ class WP_Post_Meta_Revisioning {
 						'diff' => $diff
 					);
 
+					/**
+					 * Filter revisioned meta fields used for the revisions UI.
+					 *
+					 * The dynamic portion of the hook name, `$meta_key`, refers to
+					 * the revisioned meta key.
+					 *
+					 * @since 4.6.0
+					 *
+					 * @param object $new_field     Object with id, name and diff for the UI.
+					 * @param WP_Post $compare_from The revision post to compare from.
+					 * @param WP_Post $compare_to   The revision post to compare to.
+					 */
+					$new_field = apply_filters( 'revisioned_meta_ui_field_{$meta_key}', $new_field, $compare_from, $compare_to );
+
 					$fields[ sizeof( $fields ) ] = $new_field;
 				}
 			}
