@@ -66,20 +66,17 @@ class WP_Post_Meta_Revisioning {
 				// Add this meta field if it has a diff.
 				if ( ! empty( $diff ) ) {
 
-					// Add the header if we haven't already.
-					if ( ! $meta_header_added ) {
-						$fields[ $index ]['diff'] .= '<h3>' . __( 'Revisioned Meta') . '</h3>';
-						$meta_header_added = true;
-					}
+					$new_field = array(
+						'id'   => $meta_key,
+						'name' => $meta_key,
+						'diff' => $diff
+					);
 
-					// Append the meta diffs to the last field.
-					$last_field = array_pop( $fields );
-					$last_field['diff'] .= '<h4>' . $meta_key . '</h4>';
-					$last_field['diff'] .= $diff;
-					array_push( $fields, $last_field );
+					$fields[ sizeof( $fields ) ] = $new_field;
 				}
 			}
 		}
+
 		return $fields;
 	}
 
