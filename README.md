@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/adamsilverstein/wp-post-meta-revisions.svg?branch=master)](https://travis-ci.org/adamsilverstein/wp-post-meta-revisions)
 
 === WP-Post-Meta-Revisions ===
-* Contributors: adamsilverstein, mattheu
+* Contributors: adamsilverstein, mattheu, ivankk
 * Requires at least: 4.1
 * Tested up to: 4.5
 * Stable tag: 0.2.2
