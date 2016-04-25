@@ -99,6 +99,7 @@ class WP_Post_Meta_Revisioning {
 	 */
 	public function _wp_post_revision_meta_keys( $post_id = null ) {
 		$existing_meta_keys = is_null( $post_id ) ? array() : array_keys( get_post_meta( $post_id ) );
+		$existing_meta_keys = array();
 		/**
 		 * Filter the list of post meta keys to be revisioned.
 		 *
@@ -139,7 +140,7 @@ class WP_Post_Meta_Revisioning {
 			/**
 			 * Avoid fetching the meta that doesn't exist in the source post.
 			 */
-			if ( ! array_key_exists( $meta_key, $existing_meta_keys ) ) {
+			if ( ! in_array( $meta_key, $existing_meta_keys ) ) {
 				continue;
 			}
 
