@@ -132,13 +132,15 @@ class WP_Post_Meta_Revisioning {
 		$post_id  = $revision->post_parent;
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			$meta_value = get_post_meta( $post_id, $meta_key, true );
+			$meta_values = get_post_meta( $post_id, $meta_key );
 
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
+			foreach( $meta_values as $meta_value ) {
+				/*
+				 * Use the underlying add_metadata() function vs add_post_meta()
+				 * to ensure metadata is added to the revision post and not its parent.
+				 */
+				add_metadata( 'post', $revision_id, $meta_key, $meta_value );
+			}
 		}
 	}
 
