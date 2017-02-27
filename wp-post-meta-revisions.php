@@ -42,30 +42,26 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Filter the revisions ui diff, adding revisioned meta fields.
 	 *
-	 * @param array   fields        Revision UI fields. Each item is an array of id, name and diff.
+	 * @param array   $fields       Revision UI fields. Each item is an array of id, name and diff.
 	 * @param WP_Post $compare_from The revision post to compare from.
 	 * @param WP_Post $compare_to   The revision post to compare to.
+	 *
+	 * @return array
 	 */
 	function _wp_filter_revision_ui_diff( $fields, $compare_from, $compare_to ) {
-
 		// Do we have revisioned meta fields?
 		$revisioned_meta_keys = $this->_wp_post_revision_meta_keys();
 		if ( ! empty( $revisioned_meta_keys ) ) {
+			foreach ($this->_wp_post_revision_meta_keys() as $meta_key) {
+				$meta_from = $compare_from ? apply_filters( "_wp_post_revision_field_{$meta_key}", get_post_meta( $compare_from->ID, $meta_key ), $meta_key, $compare_from, 'from' ) : array();
+				$meta_to = apply_filters( "_wp_post_revision_field_{$meta_key}", get_post_meta( $compare_to->ID, $meta_key ), $meta_key, $compare_to, 'to' );
 
-			// Only add the header once, if we have a non-empty meta field.
-			$meta_header_added = false;
-
-			// Check each meta comparison for non empty diffs.
-			foreach ( $revisioned_meta_keys as $meta_key ) {
-				$meta_from = get_post_meta( $compare_from->ID, $meta_key, true );
-				$meta_to   = get_post_meta( $compare_to->ID,   $meta_key, true );
-				$args      = array( 'show_split_view' => true );
-				$args      = apply_filters( 'revision_text_diff_options', $args, end( $fields ), $compare_from, $compare_to );
-				$diff      = wp_text_diff( $meta_from[0], $meta_to[0], $args );
+				$args = array( 'show_split_view' => true );
+				$args = apply_filters( 'revision_text_diff_options', $args, $meta_key, $compare_from, $compare_to );
+				$diff = wp_text_diff( $this->_prepare_meta_values_for_diff( $meta_from ), $this->_prepare_meta_values_for_diff( $meta_to ), $args );
 
 				// Add this meta field if it has a diff.
 				if ( ! empty( $diff ) ) {
-
 					$new_field = array(
 						'id'   => $meta_key,
 						'name' => $meta_key,
@@ -80,18 +76,63 @@ class WP_Post_Meta_Revisioning {
 					 *
 					 * @since 4.6.0
 					 *
-					 * @param object $new_field     Object with id, name and diff for the UI.
+					 * @param object  $new_field Object with id, name and diff for the UI.
 					 * @param WP_Post $compare_from The revision post to compare from.
-					 * @param WP_Post $compare_to   The revision post to compare to.
+					 * @param WP_Post $compare_to The revision post to compare to.
 					 */
-					$new_field = apply_filters( 'revisioned_meta_ui_field_{$meta_key}', $new_field, $compare_from, $compare_to );
-
-					$fields[ sizeof( $fields ) ] = $new_field;
+					$fields[] = apply_filters( "revisioned_meta_ui_field_{$meta_key}", $new_field, $compare_from, $compare_to );
 				}
 			}
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Prepares meta values for diff.
+	 * If multiple values available -> list all of them.
+	 *
+	 * @param array $meta_values Values array from get_post_meta().
+	 * @return string
+	 */
+	public function _prepare_meta_values_for_diff( $meta_values ) {
+		// values should be always an array since get_post_meta() returns an array if the $single parameter is not set.
+		if ( is_array( $meta_values ) ) {
+			// if there are multiple entires for one meta key
+			if ( count( $meta_values ) > 1 ) {
+				$item_count = 1;
+				$flattened_values = '';
+
+				foreach ( $meta_values as $value ) {
+					// if single meta value is still an array
+					if ( is_array( $value ) ) {
+						foreach ( $value as $element_key => $element_value ) {
+							$flattened_values .= "[" . $element_key . " " . $item_count . "]:\n" . $element_value . "\n";
+						}
+					} else {
+						$flattened_values .= "[" . $item_count . "]:\n" . $value . "\n";
+					}
+					$flattened_values .= "----------\n";
+					$item_count++;
+				}
+
+				return $flattened_values;
+			} else if ( count( $meta_values ) === 1 ) {
+				// get first (and only) meta value
+				$value = reset( $meta_values );
+				// if single meta value is still an array
+				if ( is_array( $value ) ) {
+					$flattened_values = '';
+					foreach ( $value as $element_key => $element_value ) {
+						$flattened_values .= "[" . $element_key . "]:\n" . $element_value . "\n";
+					}
+					return $flattened_values;
+				} else {
+					return $value;
+				}
+			}
+		}
+		return '';
 	}
 
 	/**
