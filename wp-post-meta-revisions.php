@@ -139,20 +139,19 @@ class WP_Post_Meta_Revisioning {
 
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			$meta_value = get_post_meta( $post_id, $meta_key );
+			// Serialize the meta data value.
+			$meta_value = serialize( get_post_meta( $post_id, $meta_key ) );
 
-			foreach ( $meta_value as $value ) {
-				array_push( $values, $revision_id, $meta_key, $value );
-				$place_holders[] = '(%d, %s, %s)';
-				continue;
-			}
+			// Push the value into our existing array.
+			array_push( $values, $revision_id, $meta_key, $meta_value );
+			$place_holders[] = '(%d, %s, %s)';
 		}
 
 		// Check to see if the $values aren't empty.
 		if ( ! empty( $values ) ) {
 			$query .= implode( ', ', $place_holders );
 
-			// Build the query.
+			// Build and insert the query.
 			$wpdb->query( $wpdb->prepare( "$query ", $values ) );
 		}
 	}
