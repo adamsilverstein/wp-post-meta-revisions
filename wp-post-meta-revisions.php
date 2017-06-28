@@ -130,15 +130,30 @@ class WP_Post_Meta_Revisioning {
 	public function _wp_save_revisioned_meta_fields( $revision_id ) {
 		$revision = get_post( $revision_id );
 		$post_id  = $revision->post_parent;
+
+		// Prep the query.
+		global $wpdb;
+		$query = "INSERT INTO $wpdb->postmeta ( post_id, meta_key, meta_value ) VALUES ";
+		$values = [];
+		$place_holders = [];
+
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
+			foreach ( $meta_value as $value ) {
+				array_push( $values, $revision_id, $meta_key, $value );
+				$place_holders[] = '(%d, %s, %s)';
+				continue;
+			}
+		}
+
+		// Check to see if the $values aren't empty.
+		if ( ! empty( $values ) ) {
+			$query .= implode( ', ', $place_holders );
+
+			// Build the query.
+			$wpdb->query( $wpdb->prepare( "$query ", $values ) );
 		}
 	}
 
