@@ -134,8 +134,8 @@ class WP_Post_Meta_Revisioning {
 		// Prep the query.
 		global $wpdb;
 		$query = "INSERT INTO $wpdb->postmeta ( post_id, meta_key, meta_value ) VALUES ";
-		$values = [];
-		$place_holders = [];
+		$values = array();
+		$place_holders = array();
 
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
