@@ -152,7 +152,7 @@ class WP_Post_Meta_Revisioning {
 			$query .= implode( ', ', $place_holders );
 
 			// Build and insert the query.
-			$wpdb->query( $wpdb->prepare( "$query ", $values ) );
+			$wpdb->query( $wpdb->prepare( $query, $values ) );
 		}
 	}
 
