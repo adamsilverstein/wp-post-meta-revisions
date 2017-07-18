@@ -32,6 +32,10 @@ class WP_Post_Meta_Revisioning {
 		// When revisioned post meta has changed, trigger a revision save.
 		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
+		if ( is_preview() ) {
+			_add_metadata_preview_filter();
+		}
+
 	}
 
 	/**
@@ -188,7 +192,7 @@ class WP_Post_Meta_Revisioning {
 		if ( empty( $post )
 			|| $post->ID != $object_id
 			|| ! in_array( $meta_key, $this->_wp_post_revision_meta_keys() )
-			|| 'revision' == $post->post_type )
+			|| 'revision' === $post->post_type )
 		{
 			return $value;
 		}
