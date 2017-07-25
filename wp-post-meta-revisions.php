@@ -139,8 +139,15 @@ class WP_Post_Meta_Revisioning {
 
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
+			$meta_value = get_post_meta( $post_id, $meta_key );
+
+			// Check for meta value, if empty then meta key doesnt exist for this post.
+			if ( empty( $meta_value ) ) {
+				continue 1;
+			}
+
 			// Serialize the meta data value.
-			$meta_value = serialize( get_post_meta( $post_id, $meta_key ) );
+			$meta_value = serialize( $meta_value );
 
 			// Push the value into our existing array.
 			array_push( $values, $revision_id, $meta_key, $meta_value );
