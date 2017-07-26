@@ -130,15 +130,36 @@ class WP_Post_Meta_Revisioning {
 	public function _wp_save_revisioned_meta_fields( $revision_id ) {
 		$revision = get_post( $revision_id );
 		$post_id  = $revision->post_parent;
+
+		// Prep the query.
+		global $wpdb;
+		$query = "INSERT INTO $wpdb->postmeta ( post_id, meta_key, meta_value ) VALUES ";
+		$values = array();
+		$place_holders = array();
+
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
 			$meta_value = get_post_meta( $post_id, $meta_key );
 
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
+			// Check for meta value, if empty then meta key doesnt exist for this post.
+			if ( empty( $meta_value ) ) {
+				continue 1;
+			}
+
+			// Serialize the meta data value.
+			$meta_value = serialize( $meta_value );
+
+			// Push the value into our existing array.
+			array_push( $values, $revision_id, $meta_key, $meta_value );
+			$place_holders[] = '(%d, %s, %s)';
+		}
+
+		// Check to see if the $values aren't empty.
+		if ( ! empty( $values ) ) {
+			$query .= implode( ', ', $place_holders );
+
+			// Build and insert the query.
+			$wpdb->query( $wpdb->prepare( $query, $values ) );
 		}
 	}
 
@@ -149,7 +170,7 @@ class WP_Post_Meta_Revisioning {
 	 */
 	public function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
 		// Restore revisioned meta fields.
-		$metas_revisioned =  $this->_wp_post_revision_meta_keys();
+		$metas_revisioned = $this->_wp_post_revision_meta_keys();
 		if ( isset( $metas_revisioned ) && 0 !== sizeof( $metas_revisioned ) ) {
 			foreach ( $metas_revisioned as $meta_key ) {
 				// Clear any existing metas
