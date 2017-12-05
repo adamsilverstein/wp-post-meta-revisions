@@ -101,6 +101,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 		// Add the custom field to be revised via the wp_post_revision_meta_keys filter
 		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
+		add_filter( 'wp_post_revision_single_meta_keys', array( $this, 'add_revisioned_keys' ) );
 
 		// Save the post, changing content to force a revision
 		wp_update_post(
