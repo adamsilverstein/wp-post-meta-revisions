@@ -1,8 +1,8 @@
 === WP-Post-Meta-Revisions ===
 Contributors: adamsilverstein
 Requires at least: 4.1
-Tested up to: 4.5
-Stable tag: 0.2.2
+Tested up to: 4.9
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,7 +41,10 @@ Features:
 
 == Changelog ==
 
-= 0.2.2 =
+= 1.0.0 =
+Tagging release as 1.0.
+
+= 1.0.0 =
 * Simplify by no longer storing whitelist per revision.
 
 = 0.1.9 =
