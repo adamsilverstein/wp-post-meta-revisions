@@ -34,7 +34,6 @@ class WP_Post_Meta_Revisioning {
 
 		// Add the revisioned meta to get_post_metadata for preview meta data.
 		add_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter' ), 10, 4 );
-		$this->_add_metadata_preview_filter();
 	}
 
 	/**
