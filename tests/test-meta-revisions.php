@@ -11,6 +11,86 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the revisions system for storage of meta values with slashes.
+	 *
+	 * @group revision
+	 * @group slashed
+	 * @dataProvider slashed_data_provider
+	 */
+	function test_revisions_stores_meta_values_with_slashes( $passed, $expected ) {
+		// Set up a new post
+		$post_id          = $this->factory->post->create();
+		$original_post_id = $post_id;
+
+		// And update to store an initial revision
+		wp_update_post(
+			array(
+				'post_content' => 'some initial content',
+				'ID'           => $post_id,
+			)
+		);
+		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
+
+		// Store a custom meta value, which is not revisioned by default
+		update_post_meta( $post_id, 'meta_revision_test', wp_slash( $passed ) );
+		$this->assertEquals( $expected, get_post_meta( $post_id, 'meta_revision_test', true ) );
+
+		// Update the post, storing a revision
+		wp_update_post(
+			array(
+				'post_content' => 'some more content',
+				'ID'           => $post_id,
+			)
+		);
+
+		// Overwrite
+		update_post_meta( $post_id, 'meta_revision_test', 'original' );
+		// Update the post, storing a revision
+		wp_update_post(
+			array(
+				'post_content' => 'some more content again',
+				'ID'           => $post_id,
+			)
+		);
+
+
+
+		// Restore the previous revision
+		$revisions = (Array) wp_get_post_revisions( $post_id );
+
+		// Go back two to load the previous revision
+		array_shift( $revisions );
+		$last_revision = array_shift( $revisions );
+
+		// Restore!
+		wp_restore_post_revision( $last_revision->ID );
+
+		$this->assertEquals( $expected, get_post_meta( $post_id, 'meta_revision_test', true ) );
+		remove_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
+	}
+
+	function slashed_data_provider() {
+		return array(
+			array(
+				'some\text',
+				'some\text',
+			),
+			array(
+				'test some\ \\extra \\\slashed \\\\text ',
+				'test some\ \\extra \\\slashed \\\\text ',
+			),
+			array(
+				"This \'is\' an example \n of a \"quoted\" string",
+				"This \'is\' an example \n of a \"quoted\" string",
+			),
+			array(
+				'some unslashed text just to test! % & * ( ) #',
+				'some unslashed text just to test! % & * ( ) #',
+			),
+		);
+	}
+
+	/**
 	 * Test the revisions system for storage of meta values
 	 * @group revision
 	 */
