@@ -7,14 +7,14 @@ sudo: false
 matrix:
   include:
   - php: 7.1
-    env: PHPCS_VERSION="2.3.0" PHPUNIT_VERSION="^7"
+    env: PHPUNIT_VERSION="^7"
     env: WP_TRAVISCI=travis:js
   - php: 7.3
-    env: PHPCS_VERSION="2.3.0" PHPUNIT_VERSION="^7"
+    env: PHPUNIT_VERSION="^7"
   - php: 7.2
-    env: PHPCS_VERSION="2.3.0" PHPUNIT_VERSION="^7"
+    env: PHPUNIT_VERSION="^7"
   - php: 7.1
-    env: PHPCS_VERSION="2.3.0" PHPUNIT_VERSION="^7"
+    env: PHPUNIT_VERSION="^7"
   - php: 7.0
   - php: 5.6
   - php: 5.6
@@ -30,7 +30,9 @@ matrix:
   - php: nightly
   fast_finish: true
 env:
+  global:
     - WP_VERSION=master # Git equivalent of SVN /trunk
+    - PHPUNIT_VERSION="travis"
 
 before_script:
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost master
@@ -42,7 +44,6 @@ before_install:
     # clone the WordPress develop repo
     - git clone --depth=1 --branch="master" git://develop.git.wordpress.org/ $WP_DEVELOP_DIR
     - WP_DEVELOP_DIR=/tmp/wordpress/src
-    - if [[ $PHPCS_VERSION ]]; then composer require squizlabs/php_codesniffer:${PHPCS_VERSION}; fi
     - if [[ $PHPUNIT_VERSION != "travis" ]]; then composer require phpunit/phpunit:${PHPUNIT_VERSION}; fi
 
 
