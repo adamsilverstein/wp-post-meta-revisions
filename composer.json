@@ -1,0 +1,13 @@
+{
+    "name": "adamsilverstein/wp-post-meta-revisions",
+    "authors": [
+        {
+            "name": "Adam Silverstein",
+            "email": "adam@10up.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    }
+}
