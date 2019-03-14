@@ -145,7 +145,7 @@ class WP_Post_Meta_Revisioning {
 			 * Use the underlying add_metadata() function vs add_post_meta()
 			 * to ensure metadata is added to the revision post and not its parent.
 			 */
-			add_metadata( 'post', $revision_id, $meta_key, $meta_value );
+			add_metadata( 'post', $revision_id, $meta_key, wp_slash( $meta_value ) );
 		}
 	}
 
@@ -165,7 +165,7 @@ class WP_Post_Meta_Revisioning {
 				$meta_values = get_post_meta( $revision_id, $meta_key, true );
 				if ( 0 !== sizeof( $meta_values ) && is_array( $meta_values ) ) {
 					foreach ( $meta_values as $meta_value ) {
-						add_post_meta( $post_id, $meta_key, $meta_value );
+						add_post_meta( $post_id, $meta_key, wp_slash( $meta_value ) );
 					}
 				}
 			}
