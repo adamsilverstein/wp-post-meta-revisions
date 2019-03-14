@@ -31,6 +31,7 @@ env:
 
 before_script:
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost master
+  - composer require phpunit/phpunit ^7
 
 # Before install, failures in this section will result in build status 'errored'
 before_install:
