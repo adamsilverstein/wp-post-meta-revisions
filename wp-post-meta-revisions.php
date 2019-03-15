@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Plugin Name: Post Meta Revisions
  * Plugin URI: https://github.com/adamsilverstein/wp-post-meta-revisions
  * Description: Post Meta Revisions
@@ -7,7 +7,7 @@
  * Author: Adam Silverstein - code developed with others
  * at https://core.trac.wordpress.org/ticket/20564
  * License: GPLv2 or later
-*/
+ */
 
 class WP_Post_Meta_Revisioning {
 
@@ -54,14 +54,13 @@ class WP_Post_Meta_Revisioning {
 	 * @param Post object $new_autosave The new post being autosaved.
 	 */
 	public function _wp_autosave_post_revisioned_meta_fields( $new_autosave ) {
-
-		/**
+		/*
 		 * The post data arrives as either $_POST['data']['wp_autosave'] or the $_POST
 		 * itself. This sets $posted_data to the correct variable.
 		 */
 		$posted_data = isset( $_POST['data'] ) ? $_POST['data']['wp_autosave'] : $_POST; // WPCS: CSRF ok. input var ok. sanitization ok.
 
-		/**
+		/*
 		 * Go thru the revisioned meta keys and save them as part of the autosave, if
 		 * the meta key is part of the posted data, the meta value is not blank and
 		 * the the meta value has changes from the last autosaved value.
@@ -72,7 +71,6 @@ class WP_Post_Meta_Revisioning {
 				isset( $posted_data[ $meta_key ] ) &&
 				get_post_meta( $new_autosave['ID'], $meta_key, true ) !== wp_unslash( $posted_data[ $meta_key ] )
 			) {
-
 				/*
 				 * Use the underlying delete_metadata() and add_metadata() functions
 				 * vs delete_post_meta() and add_post_meta() to make sure we're working
@@ -80,12 +78,11 @@ class WP_Post_Meta_Revisioning {
 				 */
 				delete_metadata( 'post', $new_autosave['ID'], $meta_key );
 
-				/**
+				/*
 				 * One last check to ensure meta value not empty().
 				 */
 				if ( ! empty( $posted_data[ $meta_key ] ) ) {
-
-					/**
+					/*
 					 * Add the revisions meta data to the autosave.
 					 */
 					add_metadata( 'post', $new_autosave['ID'], $meta_key, $posted_data[ $meta_key ] );
