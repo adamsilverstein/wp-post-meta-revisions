@@ -1,5 +1,15 @@
 <?php
+/**
+ * Unit test file.
+ *
+ * @package WordPress\Plugins\WP_Post_Meta_Revisions
+ * @link    https://github.com/adamsilverstein/wp-post-meta-revisions
+ * @license http://creativecommons.org/licenses/GPL/2.0/ GNU General Public License, version 2 or higher
+ */
 
+/**
+ * Tests for the "Post Meta Revisions" plugin.
+ */
 class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
