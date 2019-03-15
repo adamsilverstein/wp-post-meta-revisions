@@ -114,13 +114,35 @@ class WP_Post_Meta_Revisioning {
 	}
 
 	/**
+	 * Determine which revisioned post meta fields are single.
+	 *
+	 * @access public
+	 * @since 4.5.0
+	 *
+	 * @return array An array of meta keys that are single.
+	 */
+	public function _wp_post_revision_single_meta_keys() {
+		/**
+		 * Filter the list of post meta keys that are single.
+		 *
+		 * @since 4.5.0
+		 *
+		 * @param array $keys An array of meta fields that are single.
+		 */
+		return apply_filters( 'wp_post_revision_single_meta_keys', array() );
+	}
+
+	/**
 	 * Check whether revisioned post meta fields have changed.
 	 *
 	 * @since 4.5.0
 	 */
 	public function _wp_check_revisioned_meta_fields_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
+
+		$single_keys = $this->_wp_post_revision_single_meta_keys();
+
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			if ( get_post_meta( $post->ID, $meta_key ) !== get_post_meta( $last_revision->ID, $meta_key ) ) {
+			if ( get_post_meta( $post->ID, $meta_key, in_array( $meta_key, $single_keys ) ) !== get_post_meta( $last_revision->ID, $meta_key, in_array( $meta_key, $single_keys ) ) ) {
 				$post_has_changed = true;
 				break;
 			}
@@ -136,10 +158,10 @@ class WP_Post_Meta_Revisioning {
 	public function _wp_save_revisioned_meta_fields( $revision_id ) {
 		$revision = get_post( $revision_id );
 		$post_id  = $revision->post_parent;
-
+		$single_keys = $this->_wp_post_revision_single_meta_keys();
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			$meta_value = get_post_meta( $post_id, $meta_key );
+			$meta_value = get_post_meta( $post_id, $meta_key, in_array( $meta_key, $single_keys ) );
 
 			/*
 			 * Use the underlying add_metadata() function vs add_post_meta()
