@@ -21,10 +21,10 @@ matrix:
     env: WP_TRAVIS_OBJECT_CACHE=true
     services: memcached
   - php: 5.5
-  - php: 5.4
   - php: 5.3
+    dist: precise
   - php: 5.2
-    dist: trusty
+    dist: precise
   - php: nightly
   allow_failures:
   - php: nightly
