@@ -1,45 +1,31 @@
 
 language: php
 
-matrix:
-  include:
-  - php: 7.1
-    env: PHPUNIT_VERSION="^7"
-    env: WP_TRAVISCI=travis:js
-  - php: 7.3
-    env: PHPUNIT_VERSION="^7"
-  - php: 7.2
-    env: PHPUNIT_VERSION="^7"
-  - php: 7.1
-    env: PHPUNIT_VERSION="^7"
-  - php: 7.0
-  - php: 5.6
-  - php: 5.6
-    env: WP_TRAVIS_OBJECT_CACHE=true
-    services: memcached
-  - php: 5.5
-  - php: 5.3
-    dist: precise
-  - php: 5.2
-    dist: precise
-  - php: nightly
-
-  allow_failures:
-  - php: nightly
-
-  fast_finish: true
+# Declare versions of PHP to use.
+php:
+  - 5.6
+  - 7.0
+  - 7.1
+  - 7.2
+  - 7.3
+  - "7.4snapshot"
 
 env:
   global:
     - WP_VERSION=master # Git equivalent of SVN /trunk
-    - PHPUNIT_VERSION="travis"
+
+matrix:
+  allow_failures:
+  - php: "7.4snapshot"
+
+  fast_finish: true
 
 # Before install, failures in this section will result in build status 'errored'
 before_install:
   # clone the WordPress develop repo
   - WP_DEVELOP_DIR=/tmp/wordpress
   - git clone --depth=1 --branch="master" git://develop.git.wordpress.org/ $WP_DEVELOP_DIR
-  - if [[ $PHPUNIT_VERSION != "travis" ]]; then composer require phpunit/phpunit:${PHPUNIT_VERSION}; fi
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} > "7.1" ]]; then composer require phpunit/phpunit:^7; fi
 
 before_script:
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost master
