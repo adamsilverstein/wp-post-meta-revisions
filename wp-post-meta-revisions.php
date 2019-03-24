@@ -157,13 +157,13 @@ class WP_Post_Meta_Revisioning {
 	public function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
 		// Restore revisioned meta fields.
 		$metas_revisioned = $this->_wp_post_revision_meta_keys();
-		if ( isset( $metas_revisioned ) && 0 !== sizeof( $metas_revisioned ) ) {
+		if ( isset( $metas_revisioned ) && 0 !== count( $metas_revisioned ) ) {
 			foreach ( $metas_revisioned as $meta_key ) {
 				// Clear any existing metas
 				delete_post_meta( $post_id, $meta_key );
 				// Get the stored meta, not stored === blank
 				$meta_values = get_post_meta( $revision_id, $meta_key, true );
-				if ( 0 !== sizeof( $meta_values ) && is_array( $meta_values ) ) {
+				if ( 0 !== count( $meta_values ) && is_array( $meta_values ) ) {
 					foreach ( $meta_values as $meta_value ) {
 						add_post_meta( $post_id, $meta_key, wp_slash( $meta_value ) );
 					}
