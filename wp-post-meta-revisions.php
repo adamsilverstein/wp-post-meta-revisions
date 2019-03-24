@@ -211,4 +211,4 @@ class WP_Post_Meta_Revisioning {
 	}
 }
 
-$wp_post_meta_revisioning = new WP_Post_Meta_Revisioning;
+$wp_post_meta_revisioning = new WP_Post_Meta_Revisioning();
