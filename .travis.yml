@@ -42,3 +42,6 @@ before_script:
 script:
   # Run the unit tests.
   - if [[ ${TRAVIS_PHP_VERSION:0:3} > "7.1" ]]; then vendor/bin/phpunit; else phpunit; fi
+
+  # Lint the PHP files against parse errors.
+  - find -L . -path ./vendor -prune -o -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l
