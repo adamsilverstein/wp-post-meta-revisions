@@ -1,0 +1,27 @@
+{
+    "name": "adamsilverstein/wp-post-meta-revisions",
+    "description": "A WordPress plugin which implements a post meta revisioning feature as arrived at in https://core.trac.wordpress.org/ticket/20564.",
+    "homepage"   : "https://wordpress.org/plugins/wp-post-meta-revisions/",
+    "keywords"   : ["wordpress", "plugin" ],
+    "type"       : "wordpress-plugin",
+    "license"    : "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Adam Silverstein",
+            "email": "adam@10up.com"
+        }
+    ],
+    "support": {
+        "forum" : "https://wordpress.org/support/plugin/wp-post-meta-revisions",
+        "issues": "https://github.com/adamsilverstein/wp-post-meta-revisions/issues",
+        "source": "https://github.com/adamsilverstein/wp-post-meta-revisions"
+    },
+    "require": {
+        "php" : ">=5.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4 | ^5 | ^6 | ^7"
+    },
+    "minimum-stability" : "RC",
+    "prefer-stable": true
+}
