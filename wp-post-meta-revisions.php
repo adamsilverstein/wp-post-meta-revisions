@@ -58,7 +58,7 @@ class WP_Post_Meta_Revisioning {
 		 * The post data arrives as either $_POST['data']['wp_autosave'] or the $_POST
 		 * itself. This sets $posted_data to the correct variable.
 		 */
-		$posted_data = isset( $_POST['data'] ) ? $_POST['data']['wp_autosave'] : $_POST; // WPCS: CSRF ok. input var ok. sanitization ok.
+		$posted_data = isset( $_POST['data']['wp_autosave'] ) ? $_POST['data']['wp_autosave'] : $_POST; // WPCS: CSRF ok. input var ok. sanitization ok.
 
 		/*
 		 * Go thru the revisioned meta keys and save them as part of the autosave, if
