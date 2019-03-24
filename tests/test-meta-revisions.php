@@ -53,8 +53,6 @@ class MetaRevisionTests extends WP_UnitTestCase {
 			)
 		);
 
-
-
 		// Restore the previous revision
 		$revisions = (Array) wp_get_post_revisions( $post_id );
 
@@ -370,4 +368,3 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	}
 
 }
-
