@@ -5,7 +5,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	/**
 	 * Callback function to add the revisioned keys
 	 */
-	function add_revisioned_keys( $keys ) {
+	public function add_revisioned_keys( $keys ) {
 		$keys[] = 'meta_revision_test';
 		return $keys;
 	}
@@ -17,7 +17,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	 * @group slashed
 	 * @dataProvider slashed_data_provider
 	 */
-	function test_revisions_stores_meta_values_with_slashes( $passed, $expected ) {
+	public function test_revisions_stores_meta_values_with_slashes( $passed, $expected ) {
 		// Set up a new post
 		$post_id          = $this->factory->post->create();
 		$original_post_id = $post_id;
@@ -67,7 +67,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		remove_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
 	}
 
-	function slashed_data_provider() {
+	public function slashed_data_provider() {
 		return array(
 			array(
 				'some\text',
@@ -92,7 +92,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	 * Test the revisions system for storage of meta values
 	 * @group revision
 	 */
-	function test_revisions_stores_meta_values() {
+	public function test_revisions_stores_meta_values() {
 
 		/**
 		 * Set Up.
