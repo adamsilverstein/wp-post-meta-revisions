@@ -1,5 +1,12 @@
 <?php
 /**
+ * Post Meta Revisions, a WordPress plugin.
+ *
+ * @package WordPress\Plugins\WP_Post_Meta_Revisions
+ * @link    https://github.com/adamsilverstein/wp-post-meta-revisions
+ * @license http://creativecommons.org/licenses/GPL/2.0/ GNU General Public License, version 2 or higher
+ *
+ * @wordpress-plugin
  * Plugin Name: Post Meta Revisions
  * Plugin URI: https://github.com/adamsilverstein/wp-post-meta-revisions
  * Description: Post Meta Revisions
@@ -9,6 +16,9 @@
  * License: GPLv2 or later
  */
 
+/**
+ * Class WP_Post_Meta_Revisioning.
+ */
 class WP_Post_Meta_Revisioning {
 
 	/**
