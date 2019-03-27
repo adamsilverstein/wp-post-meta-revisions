@@ -1,5 +1,15 @@
 <?php
+/**
+ * Unit test file.
+ *
+ * @package WordPress\Plugins\WP_Post_Meta_Revisions
+ * @link    https://github.com/adamsilverstein/wp-post-meta-revisions
+ * @license http://creativecommons.org/licenses/GPL/2.0/ GNU General Public License, version 2 or higher
+ */
 
+/**
+ * Tests for the "Post Meta Revisions" plugin.
+ */
 class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
@@ -90,11 +100,11 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
 	 * Test the revisions system for storage of meta values
+	 *
 	 * @group revision
 	 */
 	public function test_revisions_stores_meta_values() {
-
-		/**
+		/*
 		 * Set Up.
 		 */
 
@@ -114,7 +124,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 1, $revisions );
 
-		/**
+		/*
 		 * First set up a meta value
 		 */
 
@@ -146,7 +156,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 3, $revisions );
 
-		/**
+		/*
 		 * Now restore the original revision
 		 */
 
@@ -164,7 +174,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 4, $revisions );
 
-		/**
+		/*
 		 * Check the meta values to verify they are NOT revisioned - they are not revisioned by default.
 		 */
 
@@ -194,12 +204,11 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		// Store custom meta values, which should now be revisioned
 		update_post_meta( $post_id, 'meta_revision_test', 'update3' );
 
-		/**
+		/*
 		 * Save the post again, custom meta should now be revisioned
 		 *
 		 * Note that a revision is saved even though there is no change
 		 * in post content, because the revisioned post_meta has changed
-		 *
 		 */
 		wp_update_post(
 			array(
@@ -222,7 +231,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
-		/**
+		/*
 		 * Verify that previous post meta is restored.
 		 */
 		$this->assertEquals( 'update2', get_post_meta( $post_id, 'meta_revision_test', true ) );
@@ -248,7 +257,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
-		/**
+		/*
 		 * Verify that previous blank post meta is restored
 		 */
 		$this->assertEquals( '', get_post_meta( $post_id, 'meta_revision_test', true ) );
@@ -280,7 +289,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
-		/**
+		/*
 		 * Verify that previous post meta is NOT restored.
 		 */
 		$this->assertEquals( 'update 6', get_post_meta( $post_id, 'meta_revision_test', true ) );
@@ -288,7 +297,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		// Add the custom field to be revised via the wp_post_revision_meta_keys filter
 		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
 
-		/**
+		/*
 		 * Test the revisioning of multiple meta keys
 		 */
 
@@ -310,12 +319,12 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
-		/**
+		/*
 		 * Verify that multiple metas stored correctly.
 		 */
 		$this->assertEquals( array( 'update 7', 'update 7 number 2', 'update 7 number 3' ), get_post_meta( $post_id, 'meta_revision_test' ) );
 
-		/**
+		/*
 		 * Test the revisioning of a multidimensional array.
 		 */
 		$test_array = array(
@@ -356,7 +365,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
-		/**
+		/*
 		 * Verify  multidimensional array stored correctly.
 		 */
 		$stored_array = get_post_meta( $post_id, 'meta_revision_test' );

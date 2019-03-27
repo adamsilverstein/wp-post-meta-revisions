@@ -1,4 +1,11 @@
 <?php
+/**
+ * Set up the environment for running the unit tests.
+ *
+ * @package WordPress\Plugins\WP_Post_Meta_Revisions
+ * @link    https://github.com/adamsilverstein/wp-post-meta-revisions
+ * @license http://creativecommons.org/licenses/GPL/2.0/ GNU General Public License, version 2 or higher
+ */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
