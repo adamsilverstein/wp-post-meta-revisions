@@ -394,4 +394,12 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	}
 
+	protected function assertPostHasMetaKey( $post_id, $meta_key ) {
+		$this->assertArrayHasKey( $meta_key, get_metadata( 'post', $post_id ) );
+	}
+
+	protected function assertPostNotHasMetaKey( $post_id, $meta_key ) {
+		$this->assertArrayNotHasKey( $meta_key, get_metadata( 'post', $post_id ) );
+	}
+
 }
