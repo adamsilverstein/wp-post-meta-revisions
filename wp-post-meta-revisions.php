@@ -146,13 +146,15 @@ class WP_Post_Meta_Revisioning {
 
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			$meta_value = get_post_meta( $post_id, $meta_key );
+			if ( metadata_exists( 'post', $post_id, $meta_key ) ) {
+				$meta_value = get_post_meta( $post_id, $meta_key );
 
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, wp_slash( $meta_value ) );
+				/*
+				 * Use the underlying add_metadata() function vs add_post_meta()
+				 * to ensure metadata is added to the revision post and not its parent.
+				 */
+				add_metadata( 'post', $revision_id, $meta_key, wp_slash( $meta_value ) );
+			}
 		}
 	}
 

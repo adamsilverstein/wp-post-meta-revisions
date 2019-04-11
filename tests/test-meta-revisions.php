@@ -394,6 +394,55 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	}
 
+	/** @test */
+	public function only_existing_meta_is_revisioned() {
+		$this->revisioned_keys[] = 'foo';
+		$this->revisioned_keys[] = 'bar';
+
+		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
+
+		// Set up a new post
+		$post_id = $this->factory->post->create( array(
+			'post_content' => 'initial content',
+		) );
+
+		// Revision v1
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => 'updated content v1',
+			)
+		);
+
+		$this->assertPostNotHasMetaKey( $post_id, 'foo' );
+		$this->assertPostNotHasMetaKey( $post_id, 'bar' );
+
+		$revisions = wp_get_post_revisions( $post_id );
+		$revision  = array_shift( $revisions );
+		$this->assertEmpty( get_metadata( 'post', $revision->ID ) );
+
+		// Revision v2
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => 'updated content v2',
+				'meta_input'   => array(
+					'foo' => 'foo v2',
+				)
+			)
+		);
+
+		$this->assertPostHasMetaKey( $post_id, 'foo' );
+		$this->assertPostNotHasMetaKey( $post_id, 'bar' );
+		$this->assertPostNotHasMetaKey( $post_id, 'meta_revision_test' );
+
+		$revisions = wp_get_post_revisions( $post_id );
+		$revision  = array_shift( $revisions );
+		$this->assertPostHasMetaKey( $revision->ID, 'foo' );
+		$this->assertPostNotHasMetaKey( $revision->ID, 'bar' );
+		$this->assertPostNotHasMetaKey( $revision->ID, 'meta_revision_test' );
+	}
+
 	protected function assertPostHasMetaKey( $post_id, $meta_key ) {
 		$this->assertArrayHasKey( $meta_key, get_metadata( 'post', $post_id ) );
 	}
