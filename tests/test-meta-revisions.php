@@ -13,11 +13,29 @@
 class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
+	 * @var array
+	 */
+	protected $revisioned_keys;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	function setUp() {
+		parent::setUp();
+
+		// Reset for current test
+		$this->revisioned_keys = array( 'meta_revision_test' );
+	}
+
+	/**
 	 * Callback function to add the revisioned keys
+	 *
+	 * @param array $keys
+	 *
+	 * @return array
 	 */
 	public function add_revisioned_keys( $keys ) {
-		$keys[] = 'meta_revision_test';
-		return $keys;
+		return array_unique( array_merge( $keys, $this->revisioned_keys ) );
 	}
 
 	/**
