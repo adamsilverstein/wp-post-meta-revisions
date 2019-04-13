@@ -146,13 +146,7 @@ class WP_Post_Meta_Revisioning {
 
 		// Save revisioned meta fields.
 		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			$meta_value = get_post_meta( $post_id, $meta_key );
-
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, wp_slash( $meta_value ) );
+			$this->copy_post_meta( $post_id, $revision_id, $meta_key );
 		}
 	}
 
@@ -162,20 +156,28 @@ class WP_Post_Meta_Revisioning {
 	 * @since 4.5.0
 	 */
 	public function _wp_restore_post_revision_meta( $post_id, $revision_id ) {
-		// Restore revisioned meta fields.
-		$metas_revisioned = $this->_wp_post_revision_meta_keys();
-		if ( isset( $metas_revisioned ) && 0 !== count( $metas_revisioned ) ) {
-			foreach ( $metas_revisioned as $meta_key ) {
-				// Clear any existing metas
-				delete_post_meta( $post_id, $meta_key );
-				// Get the stored meta, not stored === blank
-				$meta_values = get_post_meta( $revision_id, $meta_key, true );
-				if ( 0 !== count( $meta_values ) && is_array( $meta_values ) ) {
-					foreach ( $meta_values as $meta_value ) {
-						add_post_meta( $post_id, $meta_key, wp_slash( $meta_value ) );
-					}
-				}
-			}
+		foreach ( (array) $this->_wp_post_revision_meta_keys() as $meta_key ) {
+			// Clear any existing metas
+			delete_post_meta( $post_id, $meta_key );
+
+			$this->copy_post_meta( $revision_id, $post_id, $meta_key );
+		}
+	}
+
+	/**
+	 * Copy post meta for the given key from one post to another.
+	 *
+	 * @param int $source_post_id Post ID to copy meta value(s) from
+	 * @param int $target_post_id Post ID to copy meta value(s) to
+	 * @param string $meta_key    Meta key to copy
+	 */
+	protected function copy_post_meta( $source_post_id, $target_post_id, $meta_key ) {
+		foreach ( get_post_meta( $source_post_id, $meta_key ) as $meta_value ) {
+			/**
+			 * We use add_metadata() function vs add_post_meta() here
+			 * to allow for a revision post target OR regular post.
+			 */
+			add_metadata( 'post', $target_post_id, $meta_key, wp_slash( $meta_value ) );
 		}
 	}
 

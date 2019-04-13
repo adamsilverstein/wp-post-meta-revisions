@@ -198,8 +198,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 			)
 		);
 
-		$revisions = wp_get_post_revisions( $post_id );
+		$revisions = array_values( wp_get_post_revisions( $post_id ) );
 		$this->assertCount( 5, $revisions );
+		$this->assertEquals( 'update2', get_post_meta( $revisions[0]->ID, 'meta_revision_test', true ) );
 
 		// Store custom meta values, which should now be revisioned
 		update_post_meta( $post_id, 'meta_revision_test', 'update3' );
