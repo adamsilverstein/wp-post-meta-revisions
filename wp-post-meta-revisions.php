@@ -42,15 +42,20 @@ class WP_Post_Meta_Revisioning {
 		// When revisioned post meta has changed, trigger a revision save.
 		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, '_wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
+		// When `the_preview` is run, automatically add the metadata filter.
+		add_filter( 'the_preview', array( $this, '_add_metadata_preview_filter' ) );
 	}
 
 	/**
 	 * Add the revisioned meta to get_post_metadata for preview meta data.
 	 *
 	 * @since 4.5.0
+	 * @param \WP_Post $post Post object.
+	 * @return \WP_Post
 	 */
-	public function _add_metadata_preview_filter() {
+	public function _add_metadata_preview_filter( $post ) {
 		add_filter( 'get_post_metadata', array( $this, '_wp_preview_meta_filter' ), 10, 4 );
+		return $post;
 	}
 
 	/**
