@@ -1,49 +1,64 @@
-language: php
+cache:
+  apt: true
+  directories:
+    # Cache directory for older Composer versions.
+    - $HOME/.composer/cache/files
+    # Cache directory for more recent Composer versions.
+    - $HOME/.cache/composer/files
 
 language: php
 
-sudo: false
+# Declare versions of PHP to use.
+php:
+  - 5.6
+  - 7.0
+  - 7.1
+  - 7.2
+  - "7.4snapshot"
 
-matrix:
-  include:
-  - php: 7.1
-    env: PHPUNIT_VERSION="^7"
-    env: WP_TRAVISCI=travis:js
-  - php: 7.3
-    env: PHPUNIT_VERSION="^7"
-  - php: 7.2
-    env: PHPUNIT_VERSION="^7"
-  - php: 7.1
-    env: PHPUNIT_VERSION="^7"
-  - php: 7.0
-  - php: 5.6
-  - php: 5.6
-    env: WP_TRAVIS_OBJECT_CACHE=true
-    services: memcached
-  - php: 5.5
-  - php: 5.3
-    dist: precise
-  - php: 5.2
-    dist: precise
-  - php: nightly
-  allow_failures:
-  - php: nightly
-  fast_finish: true
 env:
   global:
     - WP_VERSION=master # Git equivalent of SVN /trunk
-    - PHPUNIT_VERSION="travis"
+
+matrix:
+  include:
+  - php: 7.3
+    env: PHPCS=1
+
+  allow_failures:
+  - php: "7.4snapshot"
+
+  fast_finish: true
+
+# Before install, failures in this section will result in build status 'errored'
+before_install:
+  # Speed up build time by disabling Xdebug when its not needed.
+  - phpenv config-rm xdebug.ini || echo 'No xdebug config.'
+  # clone the WordPress develop repo
+  - WP_DEVELOP_DIR=/tmp/wordpress
+  - git clone --depth=1 --branch="master" git://develop.git.wordpress.org/ $WP_DEVELOP_DIR
+  # Install additional dependencies, but only when needed.
+  - |
+    if [[ "$PHPCS" == "1" ]]; then
+      composer install
+    elif [[ ${TRAVIS_PHP_VERSION:0:3} > "7.1" ]]; then
+      composer require phpunit/phpunit:^7
+    fi
 
 before_script:
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost master
 
-# Before install, failures in this section will result in build status 'errored'
-before_install:
-    # setup WP_DEVELOP_DIR (needed for bbPress to bootstrap WP PHPUnit tests)
-    - WP_DEVELOP_DIR=/tmp/wordpress
-    # clone the WordPress develop repo
-    - git clone --depth=1 --branch="master" git://develop.git.wordpress.org/ $WP_DEVELOP_DIR
-    - WP_DEVELOP_DIR=/tmp/wordpress/src
-    - if [[ $PHPUNIT_VERSION != "travis" ]]; then composer require phpunit/phpunit:${PHPUNIT_VERSION}; fi
+script:
+  # Run the unit tests.
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} > "7.1" ]]; then vendor/bin/phpunit; else phpunit; fi
 
+  # Lint the PHP files against parse errors.
+  - find -L . -path ./vendor -prune -o -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l
+
+  # Validate the composer.json file.
+  # @link https://getcomposer.org/doc/03-cli.md#validate
+  - if [[ $TRAVIS_PHP_VERSION == "5.6" || $TRAVIS_PHP_VERSION == "7.3" ]]; then composer validate --no-check-all; fi
+
+  # Check for code style violations, best practices and PHP cross-version compatibility.
+  - if [[ "$PHPCS" == "1" ]]; then vendor/bin/phpcs --report=full,summary; fi
 
