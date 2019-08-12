@@ -117,7 +117,7 @@ class WP_Post_Meta_Revisioning {
 		 *
 		 * @param array $keys An array of default meta fields to be revisioned.
 		 */
-		return apply_filters( 'wp_post_revision_meta_keys', array() );
+		return apply_filters( 'wp_post_revision_meta_keys', array() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
 	}
 
 	/**
