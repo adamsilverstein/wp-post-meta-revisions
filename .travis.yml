@@ -8,6 +8,9 @@ cache:
 
 language: php
 
+services:
+  - mysql
+
 # Declare versions of PHP to use.
 php:
   - 5.6
