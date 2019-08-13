@@ -67,8 +67,14 @@ class WP_Post_Meta_Revisioning {
 		/*
 		 * The post data arrives as either $_POST['data']['wp_autosave'] or the $_POST
 		 * itself. This sets $posted_data to the correct variable.
+		 *
+		 * Ignoring sanitization to avoid altering meta. Ignoring the nonce check because
+		 * this is hooked on inner core hooks where a valid nonce was already checked.
+		 *
+		 * @phpcs:disable WordPress.Security
 		 */
-		$posted_data = isset( $_POST['data']['wp_autosave'] ) ? $_POST['data']['wp_autosave'] : $_POST; // phpcs:ignore WordPress.Security
+		$posted_data = isset( $_POST['data']['wp_autosave'] ) ? $_POST['data']['wp_autosave'] : $_POST;
+		// phpcs:enable
 
 		/*
 		 * Go thru the revisioned meta keys and save them as part of the autosave, if
