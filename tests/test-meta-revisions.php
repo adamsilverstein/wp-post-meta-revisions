@@ -15,9 +15,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	/**
 	 * Callback function to add the revisioned keys.
 	 *
-	 * @param Array $keys The passed array of keys to revision.
+	 * @param array $keys The passed array of keys to revision.
 	 *
-	 * @return Array The filtered array of keys to revision, including the key 'meta_revision_test'.
+	 * @return array The filtered array of keys to revision, including the key 'meta_revision_test'.
 	 */
 	public function add_revisioned_keys( $keys ) {
 		$keys[] = 'meta_revision_test';

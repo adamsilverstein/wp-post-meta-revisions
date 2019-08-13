@@ -142,7 +142,7 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Save the revisioned meta fields.
 	 *
-	 * @param int $revision_id The id of the revision to save the meta to.
+	 * @param int $revision_id The ID of the revision to save the meta to.
 	 *
 	 * @since 4.5.0
 	 */
@@ -165,8 +165,8 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Restore the revisioned meta values for a post.
 	 *
-	 * @param int $post_id    The id of the post to restore the meta to.
-	 * @param int $revision_id The id of the revision to restore the meta from.
+	 * @param int $post_id     The ID of the post to restore the meta to.
+	 * @param int $revision_id The ID of the revision to restore the meta from.
 	 *
 	 * @since 4.5.0
 	 */
