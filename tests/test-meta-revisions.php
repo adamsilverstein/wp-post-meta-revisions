@@ -14,6 +14,10 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
 	 * Callback function to add the revisioned keys.
+	 *
+	 * @param array $keys The passed array of keys to revision.
+	 *
+	 * @return array The filtered array of keys to revision, including the key 'meta_revision_test'.
 	 */
 	public function add_revisioned_keys( $keys ) {
 		$keys[] = 'meta_revision_test';
@@ -22,6 +26,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
 	 * Test the revisions system for storage of meta values with slashes.
+	 *
+	 * @param string $passed   The passed data for testing.
+	 * @param string $expected The expected value after storing & retrieving.
 	 *
 	 * @group revision
 	 * @group slashed
@@ -77,6 +84,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		remove_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
 	}
 
+	/**
+	 * Provide data for the slashed data tests.
+	 */
 	public function slashed_data_provider() {
 		return array(
 			array(
