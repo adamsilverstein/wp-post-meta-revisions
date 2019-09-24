@@ -146,6 +146,31 @@ class WP_Post_Meta_Revisioning {
 	}
 
 	/**
+	 * Get revisioned meta fields of a post
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return array|null
+	 */
+	public function get_post_revisioned_meta_fields( $post_id ) {
+		$revisioned_meta_keys = $this->wp_post_revision_meta_keys();
+
+		if ( ! is_array( $revisioned_meta_keys ) || empty( $revisioned_meta_keys ) ) {
+			return null;
+		}
+
+		$post_meta_keys = array_keys( get_post_custom( $post_id ) );
+
+		if ( ! is_array( $post_meta_keys ) || empty( $post_meta_keys ) ) {
+			return null;
+		}
+
+		$meta_keys = array_intersect( $post_meta_keys, $revisioned_meta_keys );
+
+		return $meta_keys;
+	}
+
+	/**
 	 * Save the revisioned meta fields.
 	 *
 	 * @param int $revision_id The ID of the revision to save the meta to.
