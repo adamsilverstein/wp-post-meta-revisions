@@ -171,11 +171,11 @@ class WP_Post_Meta_Revisioning {
 	 * @since 4.5.0
 	 */
 	public function wp_restore_post_revision_meta( $post_id, $revision_id ) {
+
 		// Restore revisioned meta fields.
-		$metas_revisioned = $this->wp_post_revision_meta_keys();
-		if ( isset( $metas_revisioned ) && 0 !== count( $metas_revisioned ) ) {
 		foreach ( (array) $this->_wp_post_revision_meta_keys() as $meta_key ) {
-			// Clear any existing metas
+
+			// Clear any existing meta.
 			delete_post_meta( $post_id, $meta_key );
 
 			$this->copy_post_meta( $revision_id, $post_id, $meta_key );
