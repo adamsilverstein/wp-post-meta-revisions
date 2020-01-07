@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WP-Post-Meta-Revisions" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+
+	<description>The coding standard for the WP-Post-Meta-Revisions plugin.</description>
+
+	<!--
+	#############################################################################
+	COMMAND LINE ARGUMENTS
+	https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml
+	#############################################################################
+	-->
+
+	<file>.</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+	<!-- Only check PHP files. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Show progress. -->
+	<arg value="p"/>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
+
+
+	<!--
+	#############################################################################
+	USE THE WordPress and the PHPCompatibilityWP RULESETS
+	#############################################################################
+	-->
+
+	<!-- Check code for cross-version PHP compatibility. -->
+	<config name="testVersion" value="5.6-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- Check code against the complete WordPress Coding Standards. -->
+	<rule ref="WordPress">
+		<!-- No need to lint the PHP, this is done in a separate task in the travis script. -->
+		<exclude name="Generic.PHP.Syntax"/>
+	</rule>
+
+
+	<!--
+	#############################################################################
+	SNIFF SPECIFIC CONFIGURATION
+	#############################################################################
+	-->
+
+	<!-- Set minimum supported WP version for all sniffs which use it. -->
+	<config name="minimum_supported_wp_version" value="4.7"/>
+
+	<!-- Verify that all gettext calls use the correct text domain. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="post-meta-revisions"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Verify that everything in the global namespace is prefixed with a theme specific prefix.
+		 Multiple valid prefixes can be provided as a comma-delimited list. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<!-- Provide the prefixes to look for. -->
+			<property name="prefixes" type="array">
+				<element value="wp_post_meta_revisioning"/>
+			</property>
+		</properties>
+		
+		<!-- Anything test related does not need to be prefixed as it is not shipped with the plugin. -->
+		<exclude-pattern>/tests/*\.php$</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.Files.FileName">
+		<!-- Don't trigger on the main file as renaming it would deactivate the plugin. -->
+		<exclude-pattern>/wp-post-meta-revisions\.php$</exclude-pattern>
+	</rule>
+
+</ruleset>

@@ -1,1 +1,5 @@
-vendor
+composer.lock
+vendor/*
+.phpcs.xml
+phpcs.xml
+phpunit.xml
