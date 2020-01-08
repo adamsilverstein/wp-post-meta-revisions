@@ -173,7 +173,7 @@ class WP_Post_Meta_Revisioning {
 	public function wp_restore_post_revision_meta( $post_id, $revision_id ) {
 
 		// Restore revisioned meta fields.
-		foreach ( (array) $this->_wp_post_revision_meta_keys() as $meta_key ) {
+		foreach ( (array) $this->wp_post_revision_meta_keys() as $meta_key ) {
 
 			// Clear any existing meta.
 			delete_post_meta( $post_id, $meta_key );
