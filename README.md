@@ -12,6 +12,9 @@ Allow selected post meta keys to be tracked in revisions.
 
 == Description ==
 
+## Important
+**Version 2.0.0** of this plugin introduces a streamlined storage format for revisioned meta that is not backwards compatible with previous versions (1.0 and lower) of the plugin. Restoring revisions data from a previous version is not supported and arrays may not work as expected. If you need to be able to restore from previous versions, avoid upgrading or read the full issue to see how you can migrate your data: https://github.com/adamsilverstein/wp-post-meta-revisions/pull/56/.
+
 This plugin implements a <i>post meta revisioning</i> feature as arrived at in https://core.trac.wordpress.org/ticket/20564.
 
 The goal of releasing this code as a plugin is to allow as many people as possible to easily test the post meta revisioning feature, and also hopefully move towards inclusion of the feature into core, following the <a href="https://make.wordpress.org/core/features-as-plugins/">Features as Plugins</a> model.
