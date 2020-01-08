@@ -41,6 +41,10 @@ Features:
 
 == Changelog ==
 
+= 2.0.0 =
+* Post meta storage mechanism simplified to use copy approach. This change updates the way meta is stored on the revision to mirror the meta on the post it is created from. props @aaemnnosttv, see https://github.com/adamsilverstein/wp-post-meta-revisions/pull/56.
+NOTE: This is a breaking change - restoring revisions saved in the previous format may result in an array of values restored as a single value rather than adding a value for each item in the array
+
 = 1.0.0 =
 Tagging release as 1.0.
 
