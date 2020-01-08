@@ -21,6 +21,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	 */
 	public function add_revisioned_keys( $keys ) {
 		$keys[] = 'meta_revision_test';
+		$keys[] = 'meta_multiples_test';
 		return $keys;
 	}
 
@@ -322,11 +323,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		update_post_meta( $post_id, 'meta_revision_test', 'update 8', 'update 7' );
 		update_post_meta( $post_id, 'meta_revision_test', 'update 8 number 2', 'update 7 number 2' );
 		update_post_meta( $post_id, 'meta_revision_test', 'update 8 number 3', 'update 7 number 3' );
-		wp_update_post( array( 'ID' => $post_id ) );
 
 		// Restore the previous revision.
 		$revisions = wp_get_post_revisions( $post_id );
-		array_shift( $revisions );
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
@@ -367,12 +366,8 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		// Set the test meta blank.
 		update_post_meta( $post_id, 'meta_revision_test', '' );
 
-		// Update to save.
-		wp_update_post( array( 'ID' => $post_id ) );
-
 		// Restore the previous revision.
 		$revisions = wp_get_post_revisions( $post_id );
-		array_shift( $revisions );
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
@@ -382,9 +377,34 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$stored_array = get_post_meta( $post_id, 'meta_revision_test' );
 		$this->assertEquals( $test_array, $stored_array[0] );
 
+		/*
+		 * Test multiple revisions on the same key.
+		 */
+
+		// Set the test meta to the array.
+		add_post_meta( $post_id, 'meta_multiples_test', 'test1' );
+		add_post_meta( $post_id, 'meta_multiples_test', 'test2' );
+		add_post_meta( $post_id, 'meta_multiples_test', 'test3' );
+
+		// Update to save.
+		wp_update_post( array( 'ID' => $post_id ) );
+
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect = array( 'test1', 'test2', 'test3' );
+
+ 		$this->assertEquals( $expect, $stored_array );
+
+		// Restore the previous revision.
+		$revisions = wp_get_post_revisions( $post_id );
+ 		$last_revision = array_shift( $revisions );
+		wp_restore_post_revision( $last_revision->ID );
+
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect = array( 'test1', 'test2', 'test3' );
+
+		$this->assertEquals( $expect, $stored_array );
+
 		// Cleanup!
 		wp_delete_post( $original_post_id );
-
 	}
-
 }
