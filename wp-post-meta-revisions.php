@@ -10,7 +10,7 @@
  * Plugin Name: Post Meta Revisions
  * Plugin URI: https://github.com/adamsilverstein/wp-post-meta-revisions
  * Description: Post Meta Revisions
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: Adam Silverstein - code developed with others
  * at https://core.trac.wordpress.org/ticket/20564
  * License: GPLv2 or later
@@ -192,6 +192,7 @@ class WP_Post_Meta_Revisioning {
 	 * @since 2.0.0
 	 */
 	protected function copy_post_meta( $source_post_id, $target_post_id, $meta_key ) {
+
 		foreach ( get_post_meta( $source_post_id, $meta_key ) as $meta_value ) {
 			/**
 			 * We use add_metadata() function vs add_post_meta() here
