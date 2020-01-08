@@ -185,9 +185,9 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Copy post meta for the given key from one post to another.
 	 *
-	 * @param int $source_post_id Post ID to copy meta value(s) from
-	 * @param int $target_post_id Post ID to copy meta value(s) to
-	 * @param string $meta_key    Meta key to copy
+	 * @param int    $source_post_id Post ID to copy meta value(s) from.
+	 * @param int    $target_post_id Post ID to copy meta value(s) to.
+	 * @param string $meta_key       Meta key to copy.
 	 */
 	protected function copy_post_meta( $source_post_id, $target_post_id, $meta_key ) {
 		foreach ( get_post_meta( $source_post_id, $meta_key ) as $meta_value ) {
