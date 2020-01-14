@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/adamsilverstein/wp-post-meta-revisions.svg?branch=master)](https://travis-ci.org/adamsilverstein/wp-post-meta-revisions)
 
 === WP-Post-Meta-Revisions ===
-* Contributors: adamsilverstein, mattheu
+* Contributors: adamsilverstein, mattheu, aaemnnosttv
 * Requires at least: 4.1
 * Tested up to: 4.9
 * Stable tag: 1.0.0
@@ -13,7 +13,7 @@ Allow selected post meta keys to be tracked in revisions.
 == Description ==
 
 ## Important
-**Version 2.0.0** of this plugin introduces a streamlined storage format for revisioned meta that is not backwards compatible with previous versions (1.0 and lower) of the plugin. Restoring revisions data from a previous version is not supported and arrays may not work as expected. If you need to be able to restore from previous versions, avoid upgrading or read the full issue to see how you can migrate your data: https://github.com/adamsilverstein/wp-post-meta-revisions/pull/56/.
+**Version 2.0.0** of this plugin introduces a streamlined storage format for revisioned meta that is not completely backwards compatible with previous versions of the plugin. Restoring revisions data from a previous version where array data was stored may not work as expected. If you need to be able to restore array data revisioned in previous versions, avoid upgrading or read the full issue to see how your data may be impacted: https://github.com/adamsilverstein/wp-post-meta-revisions/pull/56/.
 
 This plugin implements a <i>post meta revisioning</i> feature as arrived at in https://core.trac.wordpress.org/ticket/20564.
 
