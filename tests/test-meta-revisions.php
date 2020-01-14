@@ -2,6 +2,8 @@
 /**
  * Unit test file.
  *
+ * Test the meta revisioning features.
+ *
  * @package WordPress\Plugins\WP_Post_Meta_Revisions
  * @link    https://github.com/adamsilverstein/wp-post-meta-revisions
  * @license http://creativecommons.org/licenses/GPL/2.0/ GNU General Public License, version 2 or higher
@@ -13,6 +15,8 @@
 class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
+	 * Array of meta keys to revision.
+	 *
 	 * @var array
 	 */
 	protected $revisioned_keys;
@@ -20,17 +24,17 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	/**
 	 * {@inheritDoc}
 	 */
-	function setUp() {
+	protected function setUp() {
 		parent::setUp();
 
-		// Reset for current test
+		// Reset for current test.
 		$this->revisioned_keys = array( 'meta_revision_test' );
 	}
 
 	/**
 	 * Callback function to add the revisioned keys.
 	 *
-	 * @param array $keys
+	 * @param array $keys The array of revisioned keys.
 	 *
 	 * @return array
 	 */
@@ -40,6 +44,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
 	 * Test the revisions system for storage of meta values with slashes.
+	 *
 	 * @param string $passed   The passed data for testing.
 	 *
 	 * @param string $expected The expected value after storing & retrieving.
@@ -409,12 +414,14 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
 
-		// Set up a new post
-		$post_id = $this->factory->post->create( array(
-			'post_content' => 'initial content',
-		) );
+		// Set up a new post.
+		$post_id = $this->factory->post->create(
+			array(
+				'post_content' => 'initial content',
+			)
+		);
 
-		// Revision v1
+		// Revision v1.
 		wp_update_post(
 			array(
 				'ID'           => $post_id,
@@ -429,14 +436,14 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		$revision  = array_shift( $revisions );
 		$this->assertEmpty( get_metadata( 'post', $revision->ID ) );
 
-		// Revision v2
+		// Revision v2.
 		wp_update_post(
 			array(
 				'ID'           => $post_id,
 				'post_content' => 'updated content v2',
 				'meta_input'   => array(
 					'foo' => 'foo v2',
-				)
+				),
 			)
 		);
 
@@ -459,13 +466,15 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
 
-		// Set up a new post
-		$post_id = $this->factory->post->create( array(
-			'post_content' => 'initial content',
-			'meta_input'   => array(
-				'foo' => 'foo',
+		// Set up a new post.
+		$post_id = $this->factory->post->create(
+			array(
+				'post_content' => 'initial content',
+				'meta_input'   => array(
+					'foo' => 'foo',
+				),
 			)
-		) );
+		);
 
 		// Set the test meta to an empty string.
 		update_post_meta( $post_id, 'foo', '' );
@@ -483,10 +492,22 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * Assert the a post has a meta key.
+	 *
+	 * @param int    $post_id        The ID of the post to check.
+	 * @param string $meta_key The meta key to check for.
+	 */
 	protected function assertPostHasMetaKey( $post_id, $meta_key ) {
 		$this->assertArrayHasKey( $meta_key, get_metadata( 'post', $post_id ) );
 	}
 
+	/**
+	 * Assert that post does not have a meta key.
+	 *
+	 * @param int    $post_id        The ID of the post to check.
+	 * @param string $meta_key The meta key to check for.
+	 */
 	protected function assertPostNotHasMetaKey( $post_id, $meta_key ) {
 		$this->assertArrayNotHasKey( $meta_key, get_metadata( 'post', $post_id ) );
 	}
