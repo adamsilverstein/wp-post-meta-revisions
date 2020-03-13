@@ -10,7 +10,7 @@
  * Plugin Name: Post Meta Revisions
  * Plugin URI: https://github.com/adamsilverstein/wp-post-meta-revisions
  * Description: Post Meta Revisions
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: Adam Silverstein - code developed with others
  * at https://core.trac.wordpress.org/ticket/20564
  * License: GPLv2 or later
@@ -47,7 +47,7 @@ class WP_Post_Meta_Revisioning {
 	/**
 	 * Add the revisioned meta to get_post_metadata for preview meta data.
 	 *
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 */
 	public function add_metadata_preview_filter() {
 		add_filter( 'get_post_metadata', array( $this, 'wp_preview_meta_filter' ), 10, 4 );
@@ -59,7 +59,7 @@ class WP_Post_Meta_Revisioning {
 	 * Iterates thru the revisioned meta fields and checks each to see if they are set,
 	 * and have a changed value. If so, the meta value is saved and attached to the autosave.
 	 *
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 *
 	 * @param Post object $new_autosave The new post being autosaved.
 	 */
@@ -111,7 +111,7 @@ class WP_Post_Meta_Revisioning {
 	 * Determine which post meta fields should be revisioned.
 	 *
 	 * @access public
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 *
 	 * @return array An array of meta keys to be revisioned.
 	 */
@@ -119,7 +119,7 @@ class WP_Post_Meta_Revisioning {
 		/**
 		 * Filter the list of post meta keys to be revisioned.
 		 *
-		 * @since 4.5.0
+		 * @since 1.0.0
 		 *
 		 * @param array $keys An array of default meta fields to be revisioned.
 		 */
@@ -133,7 +133,7 @@ class WP_Post_Meta_Revisioning {
 	 * @param WP_Post $last_revision    The last revision post object.
 	 * @param WP_Post $post             The post object.
 	 *
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 */
 	public function wp_check_revisioned_meta_fields_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
 		foreach ( $this->wp_post_revision_meta_keys() as $meta_key ) {
@@ -150,7 +150,7 @@ class WP_Post_Meta_Revisioning {
 	 *
 	 * @param int $revision_id The ID of the revision to save the meta to.
 	 *
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 */
 	public function wp_save_revisioned_meta_fields( $revision_id ) {
 		$revision = get_post( $revision_id );
@@ -158,13 +158,7 @@ class WP_Post_Meta_Revisioning {
 
 		// Save revisioned meta fields.
 		foreach ( $this->wp_post_revision_meta_keys() as $meta_key ) {
-			$meta_value = get_post_meta( $post_id, $meta_key );
-
-			/*
-			 * Use the underlying add_metadata() function vs add_post_meta()
-			 * to ensure metadata is added to the revision post and not its parent.
-			 */
-			add_metadata( 'post', $revision_id, $meta_key, wp_slash( $meta_value ) );
+			$this->copy_post_meta( $post_id, $revision_id, $meta_key );
 		}
 	}
 
@@ -174,23 +168,37 @@ class WP_Post_Meta_Revisioning {
 	 * @param int $post_id     The ID of the post to restore the meta to.
 	 * @param int $revision_id The ID of the revision to restore the meta from.
 	 *
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 */
 	public function wp_restore_post_revision_meta( $post_id, $revision_id ) {
+
 		// Restore revisioned meta fields.
-		$metas_revisioned = $this->wp_post_revision_meta_keys();
-		if ( isset( $metas_revisioned ) && 0 !== count( $metas_revisioned ) ) {
-			foreach ( $metas_revisioned as $meta_key ) {
-				// Clear any existing metas.
-				delete_post_meta( $post_id, $meta_key );
-				// Get the stored meta, not stored === blank.
-				$meta_values = get_post_meta( $revision_id, $meta_key, true );
-				if ( 0 !== count( $meta_values ) && is_array( $meta_values ) ) {
-					foreach ( $meta_values as $meta_value ) {
-						add_post_meta( $post_id, $meta_key, wp_slash( $meta_value ) );
-					}
-				}
-			}
+		foreach ( (array) $this->wp_post_revision_meta_keys() as $meta_key ) {
+
+			// Clear any existing meta.
+			delete_post_meta( $post_id, $meta_key );
+
+			$this->copy_post_meta( $revision_id, $post_id, $meta_key );
+		}
+	}
+
+	/**
+	 * Copy post meta for the given key from one post to another.
+	 *
+	 * @param int    $source_post_id Post ID to copy meta value(s) from.
+	 * @param int    $target_post_id Post ID to copy meta value(s) to.
+	 * @param string $meta_key       Meta key to copy.
+	 *
+	 * @since 2.0.0
+	 */
+	protected function copy_post_meta( $source_post_id, $target_post_id, $meta_key ) {
+
+		foreach ( get_post_meta( $source_post_id, $meta_key ) as $meta_value ) {
+			/**
+			 * We use add_metadata() function vs add_post_meta() here
+			 * to allow for a revision post target OR regular post.
+			 */
+			add_metadata( 'post', $target_post_id, $meta_key, wp_slash( $meta_value ) );
 		}
 	}
 
@@ -201,7 +209,7 @@ class WP_Post_Meta_Revisioning {
 	 * Filters revisioned meta keys only.
 	 *
 	 * @access public
-	 * @since 4.5.0
+	 * @since 1.0.0
 	 *
 	 * @param mixed  $value     Meta value to filter.
 	 * @param int    $object_id Object ID.
