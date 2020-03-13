@@ -406,6 +406,28 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		add_post_meta( $post_id, 'meta_multiples_test', 'test2' );
 		add_post_meta( $post_id, 'meta_multiples_test', 'test3' );
 
+		// Update to save.
+		wp_update_post( array( 'ID' => $post_id ) );
+
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect       = array( 'test1', 'test2', 'test3' );
+
+		$this->assertEquals( $expect, $stored_array );
+
+		// Restore the previous revision.
+		$revisions     = wp_get_post_revisions( $post_id );
+		$last_revision = array_shift( $revisions );
+		wp_restore_post_revision( $last_revision->ID );
+
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect       = array( 'test1', 'test2', 'test3' );
+
+		$this->assertEquals( $expect, $stored_array );
+
+		// Cleanup!
+		wp_delete_post( $original_post_id );
+	}
+
 	/**
 	 * Verify that only existing meta is revisioned.
 	 */
