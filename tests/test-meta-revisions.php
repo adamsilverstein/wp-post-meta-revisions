@@ -39,7 +39,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function add_revisioned_keys( $keys ) {
-		return array_unique( array_merge( $keys, $this->revisioned_keys ) );
+		$keys[] = 'meta_revision_test';
+		$keys[] = 'meta_multiples_test';
+		return $keys;
 	}
 
 	/**
@@ -227,8 +229,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 			)
 		);
 
-		$revisions = wp_get_post_revisions( $post_id );
+		$revisions = array_values( wp_get_post_revisions( $post_id ) );
 		$this->assertCount( 5, $revisions );
+		$this->assertEquals( 'update2', get_post_meta( $revisions[0]->ID, 'meta_revision_test', true ) );
 
 		// Store custom meta values, which should now be revisioned.
 		update_post_meta( $post_id, 'meta_revision_test', 'update3' );
@@ -340,11 +343,9 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		update_post_meta( $post_id, 'meta_revision_test', 'update 8', 'update 7' );
 		update_post_meta( $post_id, 'meta_revision_test', 'update 8 number 2', 'update 7 number 2' );
 		update_post_meta( $post_id, 'meta_revision_test', 'update 8 number 3', 'update 7 number 3' );
-		wp_update_post( array( 'ID' => $post_id ) );
 
 		// Restore the previous revision.
-		$revisions = wp_get_post_revisions( $post_id );
-		array_shift( $revisions );
+		$revisions     = wp_get_post_revisions( $post_id );
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
@@ -385,12 +386,8 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		// Set the test meta blank.
 		update_post_meta( $post_id, 'meta_revision_test', '' );
 
-		// Update to save.
-		wp_update_post( array( 'ID' => $post_id ) );
-
 		// Restore the previous revision.
-		$revisions = wp_get_post_revisions( $post_id );
-		array_shift( $revisions );
+		$revisions     = wp_get_post_revisions( $post_id );
 		$last_revision = array_shift( $revisions );
 		wp_restore_post_revision( $last_revision->ID );
 
@@ -399,11 +396,15 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		 */
 		$stored_array = get_post_meta( $post_id, 'meta_revision_test' );
 		$this->assertEquals( $test_array, $stored_array[0] );
+		/*
 
-		// Cleanup!
-		wp_delete_post( $original_post_id );
+		 * Test multiple revisions on the same key.
+		 */
 
-	}
+		// Set the test meta to the array.
+		add_post_meta( $post_id, 'meta_multiples_test', 'test1' );
+		add_post_meta( $post_id, 'meta_multiples_test', 'test2' );
+		add_post_meta( $post_id, 'meta_multiples_test', 'test3' );
 
 	/**
 	 * Verify that only existing meta is revisioned.
@@ -482,15 +483,20 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		// Update to save.
 		wp_update_post( array( 'ID' => $post_id ) );
 
-		$this->assertPostHasMetaKey( $post_id, 'foo' );
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect       = array( 'test1', 'test2', 'test3' );
 
-		$revisions = wp_get_post_revisions( $post_id );
-		$revision  = array_shift( $revisions );
-		$this->assertPostHasMetaKey( $revision->ID, 'foo' );
+		$this->assertEquals( $expect, $stored_array );
+
+		// Restore the previous revision.
+		$revisions     = wp_get_post_revisions( $post_id );
+		$last_revision = array_shift( $revisions );
+		wp_restore_post_revision( $last_revision->ID );
 		$stored_data = get_post_meta( $post_id, 'foo' );
 		$this->assertEquals( '', $stored_data[0] );
 
-	}
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect       = array( 'test1', 'test2', 'test3' );
 
 	/**
 	 * Assert the a post has a meta key.
@@ -499,7 +505,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	 * @param string $meta_key The meta key to check for.
 	 */
 	protected function assertPostHasMetaKey( $post_id, $meta_key ) {
-		$this->assertArrayHasKey( $meta_key, get_metadata( 'post', $post_id ) );
+		$this->assertEquals( $expect, $stored_array );
 	}
 
 	/**
@@ -511,5 +517,4 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	protected function assertPostNotHasMetaKey( $post_id, $meta_key ) {
 		$this->assertArrayNotHasKey( $meta_key, get_metadata( 'post', $post_id ) );
 	}
-
 }
