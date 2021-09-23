@@ -1,6 +1,6 @@
 === WP-Post-Meta-Revisions ===
 Contributors: adamsilverstein
-Requires at least: 4.1
+Requires at least: 4.9.8
 Tested up to: 4.9
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -16,7 +16,7 @@ The goal of releasing this code as a plugin is to allow as many people as possib
 
 Further development of the code for this plugin will continue on its <a href="https://github.com/adamsilverstein/wp-post-meta-revisions">GitHub repository</a>. Pull requests welcome!
 
-To use this plugin, you must be running WordPress 4.1 or newer, two hooks were added in 4.1 that are required for this implementation.
+To use this plugin, you must be running WordPress 4.9.8 or newer, a function were added in 4.9.8 that are required for this implementation.
 
 To revision a post meta, you add its key via a filter:
 
