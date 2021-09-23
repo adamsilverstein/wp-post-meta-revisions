@@ -82,26 +82,36 @@ class WP_Post_Meta_Revisioning {
 		 * the the meta value has changes from the last autosaved value.
 		 */
 		foreach ( $this->wp_post_revision_meta_keys() as $meta_key ) {
+			if ( ! isset( $posted_data[ $meta_key ] ) ) {
+				continue;
+			}
 
-			if (
-				isset( $posted_data[ $meta_key ] ) &&
-				get_post_meta( $new_autosave['ID'], $meta_key, true ) !== wp_unslash( $posted_data[ $meta_key ] )
-			) {
-				/*
-				 * Use the underlying delete_metadata() and add_metadata() functions
-				 * vs delete_post_meta() and add_post_meta() to make sure we're working
-				 * with the actual revision meta.
-				 */
-				delete_metadata( 'post', $new_autosave['ID'], $meta_key );
+			// Default the meta value from the $_POST variable that matches the meta key.
+			$meta_value = isset( $posted_data[ $meta_key ] ) ? wp_unslash( $posted_data[ $meta_key ] ) : NULL;
 
-				/*
-				 * One last check to ensure meta value not empty().
-				 */
-				if ( ! empty( $posted_data[ $meta_key ] ) ) {
-					/*
-					 * Add the revisions meta data to the autosave.
-					 */
-					add_metadata( 'post', $new_autosave['ID'], $meta_key, $posted_data[ $meta_key ] );
+			// Find out if meta key is single/unqiue.
+			$registered_meta_keys = get_registered_meta_keys( 'post' );
+			$is_single = isset( $registered_meta_keys[ $meta_key ] ) ? $registered_meta_keys[ $meta_key ][ 'single' ] : false;
+
+			if ( get_post_meta( $new_autosave['ID'], $meta_key, $is_single ) === $meta_value ) {
+				continue;
+			}
+
+			/*
+			 * Use the underlying delete_metadata() and add_metadata() functions
+			 * vs delete_post_meta() and add_post_meta() to make sure we're working
+			 * with the actual revision meta.
+			 */
+			delete_metadata( 'post', $new_autosave['ID'], $meta_key );
+
+			/*
+			 * Add the revisions meta data to the autosave.
+			 */
+			if ( $is_single ) {
+				add_metadata( 'post', $new_autosave['ID'], $meta_key, $meta_value );
+			} else {
+				foreach ( (array) $meta_value as $value ) {
+					add_metadata( 'post', $new_autosave['ID'], $meta_key, $value );
 				}
 			}
 		}
