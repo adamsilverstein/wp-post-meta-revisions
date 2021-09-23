@@ -404,6 +404,48 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 		$this->assertEquals( $expect, $stored_array );
 
+		/*
+		 * Test autosave saving single/unique metadata.
+		 */
+
+		$_POST = array(
+			'meta_revision_test' => 'autosave',
+		);
+		wp_create_post_autosave(
+			array(
+				'post_content' => 'Autosave content.',
+				'post_ID'      => $post_id,
+				'post_type'    => 'post',
+			)
+		);
+		$autosave_post = wp_get_post_autosave( $post_id );
+		$this->assertEquals( 'autosave', get_post_meta( $autosave_post->ID, 'meta_revision_test', true ) );
+
+		/*
+		 * Test autosave saving multiple/non-unique metadata.
+		 */
+
+		// Register `meta_revision_test` as non-unique meta key.
+		register_post_meta( '', 'meta_revision_test', [ 'single' => false ] );
+
+		$_POST = array(
+			'meta_multiples_test' => array(
+				'autosave',
+				'autosave2',
+				'autosave3',
+			)
+		);
+		wp_create_post_autosave(
+			array(
+				'post_content' => 'Autosave content.',
+				'post_ID'      => $post_id,
+				'post_type'    => 'post',
+			)
+		);
+		$autosave_post = wp_get_post_autosave( $post_id );
+		$this->assertEquals( array( 'autosave', 'autosave2', 'autosave3' ), get_post_meta( $autosave_post->ID, 'meta_revision_test', false ) );
+
+
 		// Cleanup!
 		wp_delete_post( $original_post_id );
 	}
