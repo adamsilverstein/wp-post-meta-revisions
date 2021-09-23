@@ -221,11 +221,14 @@ class WP_Post_Meta_Revisioning {
 	 */
 	public function wp_preview_meta_filter( $value, $object_id, $meta_key, $single ) {
 
+		if ( ! in_array( $meta_key, $this->wp_post_revision_meta_keys(), true ) ) {
+			return $value;
+		}
+
 		$post = get_post();
 		if (
-			empty( $post ) ||
+			! $post instanceof WP_Post ||
 			$post->ID !== $object_id ||
-			! in_array( $meta_key, $this->wp_post_revision_meta_keys(), true ) ||
 			'revision' === $post->post_type
 		) {
 			return $value;
@@ -233,7 +236,7 @@ class WP_Post_Meta_Revisioning {
 
 		// Grab the autosave.
 		$preview = wp_get_post_autosave( $post->ID );
-		if ( ! is_object( $preview ) ) {
+		if ( ! $preview instanceof WP_Post ) {
 			return $value;
 		}
 
