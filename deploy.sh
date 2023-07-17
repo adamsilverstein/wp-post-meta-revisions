@@ -44,15 +44,15 @@ git commit -am "$COMMITMSG"
 echo "Tagging new version in git"
 git tag -a "$NEWVERSION1" -m "Tagging version $NEWVERSION1"
 
-echo "Pushing latest master to github, with tags"
-git push github master
-git push github master --tags
+echo "Pushing latest main to github, with tags"
+git push github main
+git push github main --tags
 
 echo
 echo "Creating local copy of SVN repo ..."
 svn co $SVNURL $SVNPATH
 
-echo "Exporting the HEAD of master from git to the trunk of SVN"
+echo "Exporting the HEAD of main from git to the trunk of SVN"
 git checkout-index -a -f --prefix=$SVNPATH/trunk/
 
 echo "Ignoring github specific files and deployment script"
