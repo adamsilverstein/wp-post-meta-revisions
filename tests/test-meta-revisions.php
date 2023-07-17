@@ -2,6 +2,8 @@
 /**
  * Unit test file.
  *
+ * Test the meta revisioning features.
+ *
  * @package WordPress\Plugins\WP_Post_Meta_Revisions
  * @link    https://github.com/adamsilverstein/wp-post-meta-revisions
  * @license http://creativecommons.org/licenses/GPL/2.0/ GNU General Public License, version 2 or higher
@@ -13,11 +15,28 @@
 class MetaRevisionTests extends WP_UnitTestCase {
 
 	/**
+	 * Array of meta keys to revision.
+	 *
+	 * @var array
+	 */
+	protected $revisioned_keys;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function setUp() {
+		parent::setUp();
+
+		// Reset for current test.
+		$this->revisioned_keys = array( 'meta_revision_test' );
+	}
+
+	/**
 	 * Callback function to add the revisioned keys.
 	 *
-	 * @param array $keys The passed array of keys to revision.
+	 * @param array $keys The array of revisioned keys.
 	 *
-	 * @return array The filtered array of keys to revision, including the key 'meta_revision_test'.
+	 * @return array
 	 */
 	public function add_revisioned_keys( $keys ) {
 		$keys[] = 'meta_revision_test';
@@ -29,6 +48,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 	 * Test the revisions system for storage of meta values with slashes.
 	 *
 	 * @param string $passed   The passed data for testing.
+	 *
 	 * @param string $expected The expected value after storing & retrieving.
 	 *
 	 * @group revision
@@ -376,8 +396,8 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		 */
 		$stored_array = get_post_meta( $post_id, 'meta_revision_test' );
 		$this->assertEquals( $test_array, $stored_array[0] );
-
 		/*
+
 		 * Test multiple revisions on the same key.
 		 */
 
@@ -406,5 +426,117 @@ class MetaRevisionTests extends WP_UnitTestCase {
 
 		// Cleanup!
 		wp_delete_post( $original_post_id );
+	}
+
+	/**
+	 * Verify that only existing meta is revisioned.
+	 */
+	public function only_existing_meta_is_revisioned() {
+		$this->revisioned_keys[] = 'foo';
+		$this->revisioned_keys[] = 'bar';
+
+		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
+
+		// Set up a new post.
+		$post_id = $this->factory->post->create(
+			array(
+				'post_content' => 'initial content',
+			)
+		);
+
+		// Revision v1.
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => 'updated content v1',
+			)
+		);
+
+		$this->assertPostNotHasMetaKey( $post_id, 'foo' );
+		$this->assertPostNotHasMetaKey( $post_id, 'bar' );
+
+		$revisions = wp_get_post_revisions( $post_id );
+		$revision  = array_shift( $revisions );
+		$this->assertEmpty( get_metadata( 'post', $revision->ID ) );
+
+		// Revision v2.
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => 'updated content v2',
+				'meta_input'   => array(
+					'foo' => 'foo v2',
+				),
+			)
+		);
+
+		$this->assertPostHasMetaKey( $post_id, 'foo' );
+		$this->assertPostNotHasMetaKey( $post_id, 'bar' );
+		$this->assertPostNotHasMetaKey( $post_id, 'meta_revision_test' );
+
+		$revisions = wp_get_post_revisions( $post_id );
+		$revision  = array_shift( $revisions );
+		$this->assertPostHasMetaKey( $revision->ID, 'foo' );
+		$this->assertPostNotHasMetaKey( $revision->ID, 'bar' );
+		$this->assertPostNotHasMetaKey( $revision->ID, 'meta_revision_test' );
+	}
+
+	/**
+	 * Verify that blank strings are revisioned correctly.
+	 */
+	public function blank_meta_is_revisioned() {
+		$this->revisioned_keys[] = 'foo';
+
+		add_filter( 'wp_post_revision_meta_keys', array( $this, 'add_revisioned_keys' ) );
+
+		// Set up a new post.
+		$post_id = $this->factory->post->create(
+			array(
+				'post_content' => 'initial content',
+				'meta_input'   => array(
+					'foo' => 'foo',
+				),
+			)
+		);
+
+		// Set the test meta to an empty string.
+		update_post_meta( $post_id, 'foo', '' );
+
+		// Update to save.
+		wp_update_post( array( 'ID' => $post_id ) );
+
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect       = array( 'test1', 'test2', 'test3' );
+
+		$this->assertEquals( $expect, $stored_array );
+
+		// Restore the previous revision.
+		$revisions     = wp_get_post_revisions( $post_id );
+		$last_revision = array_shift( $revisions );
+		wp_restore_post_revision( $last_revision->ID );
+		$stored_data = get_post_meta( $post_id, 'foo' );
+		$this->assertEquals( '', $stored_data[0] );
+
+		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
+		$expect       = array( 'test1', 'test2', 'test3' );
+
+	/**
+	 * Assert the a post has a meta key.
+	 *
+	 * @param int    $post_id        The ID of the post to check.
+	 * @param string $meta_key The meta key to check for.
+	 */
+	protected function assertPostHasMetaKey( $post_id, $meta_key ) {
+		$this->assertEquals( $expect, $stored_array );
+	}
+
+	/**
+	 * Assert that post does not have a meta key.
+	 *
+	 * @param int    $post_id        The ID of the post to check.
+	 * @param string $meta_key The meta key to check for.
+	 */
+	protected function assertPostNotHasMetaKey( $post_id, $meta_key ) {
+		$this->assertArrayNotHasKey( $meta_key, get_metadata( 'post', $post_id ) );
 	}
 }

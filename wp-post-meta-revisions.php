@@ -158,7 +158,9 @@ class WP_Post_Meta_Revisioning {
 
 		// Save revisioned meta fields.
 		foreach ( $this->wp_post_revision_meta_keys() as $meta_key ) {
-			$this->copy_post_meta( $post_id, $revision_id, $meta_key );
+			if ( metadata_exists( 'post', $post_id, $meta_key ) ) {
+				$this->copy_post_meta( $post_id, $revision_id, $meta_key );
+			}
 		}
 	}
 
