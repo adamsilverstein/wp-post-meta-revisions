@@ -193,7 +193,7 @@ class WP_Post_Meta_Revisioning {
 	 *
 	 * @since 2.0.0
 	 */
-	protected function copy_post_meta( $source_post_id, $target_post_id, $meta_key ) {
+	private function copy_post_meta( $source_post_id, $target_post_id, $meta_key ) {
 
 		foreach ( get_post_meta( $source_post_id, $meta_key ) as $meta_value ) {
 			/**
