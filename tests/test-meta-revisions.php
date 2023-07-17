@@ -516,9 +516,7 @@ class MetaRevisionTests extends WP_UnitTestCase {
 		wp_restore_post_revision( $last_revision->ID );
 		$stored_data = get_post_meta( $post_id, 'foo' );
 		$this->assertEquals( '', $stored_data[0] );
-
-		$stored_array = get_post_meta( $post_id, 'meta_multiples_test' );
-		$expect       = array( 'test1', 'test2', 'test3' );
+	}
 
 	/**
 	 * Assert the a post has a meta key.
