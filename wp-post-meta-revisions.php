@@ -42,6 +42,84 @@ class WP_Post_Meta_Revisioning {
 		// When revisioned post meta has changed, trigger a revision save.
 		add_filter( 'wp_save_post_revision_post_has_changed', array( $this, 'wp_check_revisioned_meta_fields_have_changed' ), 10, 3 );
 
+		// Add the revisioned meta to the JS data for the revisions interface.
+		add_filter( 'wp_prepare_revision_for_js', array( $this, '_wp_add_meta_to_prepare_revision_for_js' ), 10, 3 );
+
+		// Filter the diff ui returned for the revisions screen.
+		add_filter( 'wp_get_revision_ui_diff', array( $this, '_wp_filter_revision_ui_diff' ), 10, 3 );
+	}
+
+	/**
+	 * Filter the revisions ui diff, adding revisioned meta fields.
+	 *
+	 * @param array   fields        Revision UI fields. Each item is an array of id, name and diff.
+	 * @param WP_Post $compare_from The revision post to compare from.
+	 * @param WP_Post $compare_to   The revision post to compare to.
+	 */
+	function _wp_filter_revision_ui_diff( $fields, $compare_from, $compare_to ) {
+
+		// Do we have revisioned meta fields?
+		$revisioned_meta_keys = $this->_wp_post_revision_meta_keys();
+		if ( ! empty( $revisioned_meta_keys ) ) {
+
+			// Only add the header once, if we have a non-empty meta field.
+			$meta_header_added = false;
+
+			// Check each meta comparison for non empty diffs.
+			foreach ( $revisioned_meta_keys as $meta_key ) {
+				$meta_from = get_post_meta( $compare_from->ID, $meta_key, true );
+				$meta_to   = get_post_meta( $compare_to->ID,   $meta_key, true );
+				$args      = array( 'show_split_view' => true );
+				$args      = apply_filters( 'revision_text_diff_options', $args, end( $fields ), $compare_from, $compare_to );
+				$diff      = wp_text_diff( $meta_from[0], $meta_to[0], $args );
+
+				// Add this meta field if it has a diff.
+				if ( ! empty( $diff ) ) {
+
+					$new_field = array(
+						'id'   => $meta_key,
+						'name' => $meta_key,
+						'diff' => $diff
+					);
+
+					/**
+					 * Filter revisioned meta fields used for the revisions UI.
+					 *
+					 * The dynamic portion of the hook name, `$meta_key`, refers to
+					 * the revisioned meta key.
+					 *
+					 * @since 4.6.0
+					 *
+					 * @param object $new_field     Object with id, name and diff for the UI.
+					 * @param WP_Post $compare_from The revision post to compare from.
+					 * @param WP_Post $compare_to   The revision post to compare to.
+					 */
+					$new_field = apply_filters( 'revisioned_meta_ui_field_{$meta_key}', $new_field, $compare_from, $compare_to );
+
+					$fields[ sizeof( $fields ) ] = $new_field;
+				}
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Add the revisioned meta fields to the revisions interface.
+	 *
+	 * Include filters to enable customization of the meta display.
+	 */
+	function _wp_add_meta_to_prepare_revision_for_js( $revisions_data, $revision, $post ) {
+
+		$revisions_data['revisionedMeta'] = array();
+
+		// Go thru revisioned meta fields, adding them to the display data.
+		foreach ( $this->_wp_post_revision_meta_keys() as $meta_key ) {
+			$revisions_data['revisionedMeta'][] = array(
+					$meta_key => get_post_meta( $revisions_data['id'], $meta_key, true ),
+				);
+		}
+		return $revisions_data;
 	}
 
 	/**
